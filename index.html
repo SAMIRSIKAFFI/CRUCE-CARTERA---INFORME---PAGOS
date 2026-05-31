@@ -7,439 +7,114 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
-
   :root {
-    --c-bg: #0f0f0f;
-    --c-surface: #1a1a1a;
-    --c-surface2: #222222;
-    --c-border: #2e2e2e;
-    --c-border2: #3d3d3d;
-    --c-text: #e8e8e8;
-    --c-text2: #9a9a9a;
-    --c-text3: #666;
-    --c-accent: #d4a853;
-    --c-accent2: #b8832d;
-    --c-ok: #4caf7d;
-    --c-warn: #e0854a;
-    --c-err: #e05050;
-    --c-info: #5a9fd4;
-    --radius: 6px;
-    --radius-lg: 10px;
+    --c-bg:#0f0f0f;--c-surface:#1a1a1a;--c-surface2:#222;--c-border:#2e2e2e;
+    --c-border2:#3d3d3d;--c-text:#e8e8e8;--c-text2:#9a9a9a;--c-text3:#666;
+    --c-accent:#d4a853;--c-accent2:#b8832d;--c-ok:#4caf7d;--c-warn:#e0854a;
+    --c-err:#e05050;--c-info:#5a9fd4;--radius:6px;--radius-lg:10px;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'IBM Plex Sans', sans-serif;
-    background: var(--c-bg);
-    color: var(--c-text);
-    min-height: 100vh;
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  /* ── Header ── */
-  header {
-    border-bottom: 1px solid var(--c-border);
-    padding: 0 2rem;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    position: sticky;
-    top: 0;
-    background: var(--c-bg);
-    z-index: 100;
-  }
-
-  .logo-mark {
-    width: 32px; height: 32px;
-    background: var(--c-accent);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px; font-weight: 500;
-    color: #0f0f0f;
-    flex-shrink: 0;
-  }
-
-  header h1 { font-size: 14px; font-weight: 500; letter-spacing: 0.02em; }
-  header span { font-size: 12px; color: var(--c-text3); font-family: 'IBM Plex Mono', monospace; }
-
-  .header-right {
-    margin-left: auto;
-    display: flex; align-items: center; gap: 8px;
-  }
-
-  .status-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--c-text3);
-    transition: background 0.3s;
-  }
-  .status-dot.ready { background: var(--c-ok); }
-
-  /* ── Layout ── */
-  .shell {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    min-height: calc(100vh - 56px);
-  }
-
-  /* ── Sidebar ── */
-  aside {
-    border-right: 1px solid var(--c-border);
-    padding: 1.5rem 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .sidebar-section {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--c-text3);
-    padding: 0.75rem 0.5rem 0.4rem;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-
-  .step-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: background 0.15s;
-    border: 1px solid transparent;
-  }
-
-  .step-item:hover { background: var(--c-surface); }
-  .step-item.active { background: var(--c-surface2); border-color: var(--c-border2); }
-
-  .step-num {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    border: 1px solid var(--c-border2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px;
-    font-family: 'IBM Plex Mono', monospace;
-    color: var(--c-text3);
-    flex-shrink: 0;
-    transition: all 0.2s;
-  }
-
-  .step-item.done .step-num {
-    background: var(--c-ok);
-    border-color: var(--c-ok);
-    color: #0f0f0f;
-    font-weight: 600;
-  }
-
-  .step-item.active .step-num {
-    border-color: var(--c-accent);
-    color: var(--c-accent);
-  }
-
-  .step-label { font-size: 13px; font-weight: 400; }
-  .step-sub { font-size: 11px; color: var(--c-text3); }
-
-  .sidebar-divider {
-    height: 1px;
-    background: var(--c-border);
-    margin: 0.5rem 0;
-  }
-
-  /* ── Main content ── */
-  main {
-    padding: 2rem;
-    max-width: 960px;
-  }
-
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  .panel-title {
-    font-size: 20px;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-  }
-
-  .panel-desc {
-    font-size: 13px;
-    color: var(--c-text2);
-    margin-bottom: 2rem;
-  }
-
-  /* ── Upload zone ── */
-  .upload-zone {
-    border: 1.5px dashed var(--c-border2);
-    border-radius: var(--radius-lg);
-    padding: 2.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: var(--c-surface);
-    position: relative;
-  }
-
-  .upload-zone:hover,
-  .upload-zone.drag-over {
-    border-color: var(--c-accent);
-    background: rgba(212,168,83,0.04);
-  }
-
-  .upload-zone input[type=file] {
-    position: absolute; inset: 0;
-    opacity: 0; cursor: pointer; width: 100%; height: 100%;
-  }
-
-  .upload-icon {
-    font-size: 28px; margin-bottom: 0.75rem;
-    color: var(--c-text3);
-  }
-
-  .upload-zone h3 { font-size: 14px; font-weight: 500; margin-bottom: 0.25rem; }
-  .upload-zone p { font-size: 12px; color: var(--c-text3); }
-
-  /* ── File tag ── */
-  .file-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    background: var(--c-surface2);
-    border: 1px solid var(--c-border2);
-    border-radius: 20px;
-    font-size: 12px;
-    font-family: 'IBM Plex Mono', monospace;
-    margin-top: 0.75rem;
-  }
-
-  .file-tag .dot { width: 6px; height: 6px; border-radius: 50%; }
-  .dot-ok { background: var(--c-ok); }
-  .dot-warn { background: var(--c-warn); }
-
-  /* ── File list (carteras múltiples) ── */
-  .file-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 0.75rem;
-  }
-
-  /* ── Stats grid ── */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-    margin: 1.5rem 0;
-  }
-
-  .stat-card {
-    background: var(--c-surface);
-    border: 1px solid var(--c-border);
-    border-radius: var(--radius-lg);
-    padding: 1rem;
-  }
-
-  .stat-label { font-size: 11px; color: var(--c-text3); text-transform: uppercase; letter-spacing: 0.08em; font-family: 'IBM Plex Mono', monospace; }
-  .stat-value { font-size: 26px; font-weight: 500; margin-top: 2px; font-variant-numeric: tabular-nums; }
-  .stat-value.ok { color: var(--c-ok); }
-  .stat-value.warn { color: var(--c-warn); }
-  .stat-value.err { color: var(--c-err); }
-  .stat-value.info { color: var(--c-info); }
-
-  /* ── Buttons ── */
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 18px;
-    border-radius: var(--radius);
-    font-size: 13px; font-weight: 500;
-    cursor: pointer;
-    border: none;
-    transition: all 0.15s;
-    font-family: 'IBM Plex Sans', sans-serif;
-  }
-
-  .btn-primary {
-    background: var(--c-accent);
-    color: #0f0f0f;
-  }
-  .btn-primary:hover { background: var(--c-accent2); }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .btn-ghost {
-    background: transparent;
-    color: var(--c-text2);
-    border: 1px solid var(--c-border2);
-  }
-  .btn-ghost:hover { background: var(--c-surface); color: var(--c-text); }
-
-  .btn-ok {
-    background: var(--c-ok);
-    color: #0f0f0f;
-  }
-  .btn-ok:hover { filter: brightness(1.1); }
-
-  /* ── Process section ── */
-  .process-card {
-    background: var(--c-surface);
-    border: 1px solid var(--c-border);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .process-card h3 { font-size: 14px; font-weight: 500; margin-bottom: 0.5rem; }
-  .process-card p { font-size: 13px; color: var(--c-text2); }
-
-  /* ── Table ── */
-  .table-wrap {
-    overflow-x: auto;
-    border: 1px solid var(--c-border);
-    border-radius: var(--radius-lg);
-    margin-top: 1rem;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-
-  thead th {
-    background: var(--c-surface2);
-    padding: 8px 12px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--c-text3);
-    border-bottom: 1px solid var(--c-border);
-    white-space: nowrap;
-  }
-
-  tbody td {
-    padding: 7px 12px;
-    border-bottom: 1px solid var(--c-border);
-    color: var(--c-text2);
-    white-space: nowrap;
-  }
-
-  tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover td { background: var(--c-surface); }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 10px;
-    font-weight: 500;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-
-  .badge-ok { background: rgba(76,175,125,0.15); color: var(--c-ok); }
-  .badge-err { background: rgba(224,80,80,0.15); color: var(--c-err); }
-  .badge-warn { background: rgba(224,133,74,0.15); color: var(--c-warn); }
-
-  /* ── Resultados ── */
-  .result-section { margin-top: 2rem; }
-  .result-title {
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--c-text3);
-    font-family: 'IBM Plex Mono', monospace;
-    margin-bottom: 0.75rem;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .result-title::after {
-    content: ''; flex: 1; height: 1px; background: var(--c-border);
-  }
-
-  /* ── Timeline/Steps ── */
-  .checklist {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin: 1rem 0;
-  }
-
-  .check-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: var(--radius);
-    background: var(--c-surface);
-    border: 1px solid var(--c-border);
-    font-size: 13px;
-  }
-
-  .check-item .ci-icon { font-size: 16px; }
-  .check-item.ci-ok { border-color: rgba(76,175,125,0.3); }
-  .check-item.ci-ok .ci-icon { color: var(--c-ok); }
-  .check-item.ci-err { border-color: rgba(224,80,80,0.3); }
-  .check-item.ci-err .ci-icon { color: var(--c-err); }
-  .check-item.ci-pending .ci-icon { color: var(--c-text3); }
-
-  .check-item .ci-label { font-weight: 400; }
-  .check-item .ci-count { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--c-text3); }
-
-  /* ── Progress bar ── */
-  .progress-wrap { background: var(--c-surface); border-radius: 3px; height: 4px; margin-top: 0.5rem; overflow: hidden; }
-  .progress-bar { height: 100%; background: var(--c-accent); border-radius: 3px; transition: width 0.5s ease; }
-
-  /* ── Alert ── */
-  .alert {
-    padding: 12px 14px;
-    border-radius: var(--radius);
-    font-size: 13px;
-    margin: 1rem 0;
-    display: flex; gap: 8px;
-    border-left: 3px solid;
-  }
-  .alert-warn { background: rgba(224,133,74,0.1); border-color: var(--c-warn); color: var(--c-text2); }
-  .alert-ok { background: rgba(76,175,125,0.1); border-color: var(--c-ok); color: var(--c-text2); }
-  .alert-info { background: rgba(90,159,212,0.1); border-color: var(--c-info); color: var(--c-text2); }
-
-  /* ── Footer nav ── */
-  .panel-nav {
-    display: flex; gap: 10px;
-    margin-top: 2rem; padding-top: 1.5rem;
-    border-top: 1px solid var(--c-border);
-  }
-
-  /* ── Log output ── */
-  .log-box {
-    background: var(--c-surface);
-    border: 1px solid var(--c-border);
-    border-radius: var(--radius);
-    padding: 12px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--c-text3);
-    max-height: 160px;
-    overflow-y: auto;
-    line-height: 1.8;
-    margin-top: 1rem;
-  }
-
-  .log-line-ok { color: var(--c-ok); }
-  .log-line-err { color: var(--c-err); }
-  .log-line-warn { color: var(--c-warn); }
-
-  /* ── Responsive ── */
-  @media (max-width: 768px) {
-    .shell { grid-template-columns: 1fr; }
-    aside { display: none; }
-  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'IBM Plex Sans',sans-serif;background:var(--c-bg);color:var(--c-text);min-height:100vh;font-size:14px;line-height:1.6;}
+  header{border-bottom:1px solid var(--c-border);padding:0 2rem;height:56px;display:flex;align-items:center;gap:14px;position:sticky;top:0;background:var(--c-bg);z-index:100;}
+  .logo-mark{width:32px;height:32px;background:var(--c-accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:#0f0f0f;flex-shrink:0;}
+  header h1{font-size:14px;font-weight:500;letter-spacing:.02em;}
+  header span{font-size:12px;color:var(--c-text3);font-family:'IBM Plex Mono',monospace;}
+  .header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--c-text3);transition:background .3s;}
+  .status-dot.ready{background:var(--c-ok);}
+  .shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 56px);}
+  aside{border-right:1px solid var(--c-border);padding:1.5rem 1rem;display:flex;flex-direction:column;gap:.5rem;}
+  .sidebar-section{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--c-text3);padding:.75rem .5rem .4rem;font-family:'IBM Plex Mono',monospace;}
+  .step-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius);cursor:pointer;transition:background .15s;border:1px solid transparent;}
+  .step-item:hover{background:var(--c-surface);}
+  .step-item.active{background:var(--c-surface2);border-color:var(--c-border2);}
+  .step-num{width:22px;height:22px;border-radius:50%;border:1px solid var(--c-border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--c-text3);flex-shrink:0;transition:all .2s;}
+  .step-item.done .step-num{background:var(--c-ok);border-color:var(--c-ok);color:#0f0f0f;font-weight:600;}
+  .step-item.active .step-num{border-color:var(--c-accent);color:var(--c-accent);}
+  .step-label{font-size:13px;font-weight:400;}
+  .step-sub{font-size:11px;color:var(--c-text3);}
+  .sidebar-divider{height:1px;background:var(--c-border);margin:.5rem 0;}
+  main{padding:2rem;max-width:960px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .panel-title{font-size:20px;font-weight:500;margin-bottom:.25rem;}
+  .panel-desc{font-size:13px;color:var(--c-text2);margin-bottom:2rem;}
+  .upload-zone{border:1.5px dashed var(--c-border2);border-radius:var(--radius-lg);padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--c-surface);position:relative;}
+  .upload-zone:hover,.upload-zone.drag-over{border-color:var(--c-accent);background:rgba(212,168,83,.04);}
+  .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+  .upload-icon{font-size:28px;margin-bottom:.75rem;color:var(--c-text3);}
+  .upload-zone h3{font-size:14px;font-weight:500;margin-bottom:.25rem;}
+  .upload-zone p{font-size:12px;color:var(--c-text3);}
+  .file-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--c-surface2);border:1px solid var(--c-border2);border-radius:20px;font-size:12px;font-family:'IBM Plex Mono',monospace;margin-top:.75rem;}
+  .file-tag .dot{width:6px;height:6px;border-radius:50%;}
+  .dot-ok{background:var(--c-ok);}
+  .dot-warn{background:var(--c-warn);}
+  .file-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:.75rem;}
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:1.5rem 0;}
+  .stat-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-lg);padding:1rem;}
+  .stat-label{font-size:11px;color:var(--c-text3);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono',monospace;}
+  .stat-value{font-size:26px;font-weight:500;margin-top:2px;font-variant-numeric:tabular-nums;}
+  .stat-value.ok{color:var(--c-ok);}
+  .stat-value.warn{color:var(--c-warn);}
+  .stat-value.err{color:var(--c-err);}
+  .stat-value.info{color:var(--c-info);}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'IBM Plex Sans',sans-serif;}
+  .btn-primary{background:var(--c-accent);color:#0f0f0f;}
+  .btn-primary:hover{background:var(--c-accent2);}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--c-text2);border:1px solid var(--c-border2);}
+  .btn-ghost:hover{background:var(--c-surface);color:var(--c-text);}
+  .btn-ok{background:var(--c-ok);color:#0f0f0f;}
+  .btn-ok:hover{filter:brightness(1.1);}
+  .btn-ok:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-warn{background:var(--c-warn);color:#0f0f0f;}
+  .btn-warn:hover{filter:brightness(1.1);}
+  .btn-warn:disabled{opacity:.4;cursor:not-allowed;}
+  .process-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;}
+  .process-card h3{font-size:14px;font-weight:500;margin-bottom:.5rem;}
+  .process-card p{font-size:13px;color:var(--c-text2);}
+  .table-wrap{overflow-x:auto;border:1px solid var(--c-border);border-radius:var(--radius-lg);margin-top:1rem;}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-family:'IBM Plex Mono',monospace;}
+  thead th{background:var(--c-surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--c-text3);border-bottom:1px solid var(--c-border);white-space:nowrap;}
+  tbody td{padding:7px 12px;border-bottom:1px solid var(--c-border);color:var(--c-text2);white-space:nowrap;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover td{background:var(--c-surface);}
+  .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:500;font-family:'IBM Plex Mono',monospace;}
+  .badge-ok{background:rgba(76,175,125,.15);color:var(--c-ok);}
+  .badge-err{background:rgba(224,80,80,.15);color:var(--c-err);}
+  .badge-warn{background:rgba(224,133,74,.15);color:var(--c-warn);}
+  .result-title{font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--c-text3);font-family:'IBM Plex Mono',monospace;margin-bottom:.75rem;display:flex;align-items:center;gap:8px;}
+  .result-title::after{content:'';flex:1;height:1px;background:var(--c-border);}
+  .checklist{display:flex;flex-direction:column;gap:8px;margin:1rem 0;}
+  .check-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius);background:var(--c-surface);border:1px solid var(--c-border);font-size:13px;}
+  .check-item .ci-icon{font-size:16px;}
+  .check-item.ci-ok{border-color:rgba(76,175,125,.3);}
+  .check-item.ci-ok .ci-icon{color:var(--c-ok);}
+  .check-item.ci-err{border-color:rgba(224,80,80,.3);}
+  .check-item.ci-err .ci-icon{color:var(--c-err);}
+  .check-item.ci-pending .ci-icon{color:var(--c-text3);}
+  .check-item .ci-label{font-weight:400;}
+  .check-item .ci-count{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--c-text3);}
+  .progress-wrap{background:var(--c-surface);border-radius:3px;height:4px;margin-top:.5rem;overflow:hidden;}
+  .progress-bar{height:100%;background:var(--c-accent);border-radius:3px;transition:width .5s ease;}
+  .alert{padding:12px 14px;border-radius:var(--radius);font-size:13px;margin:1rem 0;display:flex;gap:8px;border-left:3px solid;}
+  .alert-warn{background:rgba(224,133,74,.1);border-color:var(--c-warn);color:var(--c-text2);}
+  .alert-ok{background:rgba(76,175,125,.1);border-color:var(--c-ok);color:var(--c-text2);}
+  .alert-info{background:rgba(90,159,212,.1);border-color:var(--c-info);color:var(--c-text2);}
+  .panel-nav{display:flex;gap:10px;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--c-border);}
+  .log-box{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--c-text3);max-height:200px;overflow-y:auto;line-height:1.8;margin-top:1rem;}
+  .log-line-ok{color:var(--c-ok);}
+  .log-line-err{color:var(--c-err);}
+  .log-line-warn{color:var(--c-warn);}
+  .download-box{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;}
+  .download-box h3{font-size:14px;font-weight:500;margin-bottom:.4rem;}
+  .download-box p{font-size:12px;color:var(--c-text3);margin-bottom:1rem;line-height:1.6;}
+  .download-box .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;}
+  .tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:11px;font-family:'IBM Plex Mono',monospace;}
+  .tag-ok{background:rgba(76,175,125,.15);color:var(--c-ok);}
+  .tag-warn{background:rgba(224,133,74,.15);color:var(--c-warn);}
+  .tag-err{background:rgba(224,80,80,.15);color:var(--c-err);}
+  @media(max-width:768px){.shell{grid-template-columns:1fr;}aside{display:none;}}
 </style>
 </head>
 <body>
@@ -452,794 +127,728 @@
   </div>
   <div class="header-right">
     <div class="status-dot" id="statusDot"></div>
-    <span style="font-size:12px; color:var(--c-text3); font-family:'IBM Plex Mono',monospace" id="statusText">sin datos</span>
+    <span style="font-size:12px;color:var(--c-text3);font-family:'IBM Plex Mono',monospace" id="statusText">sin datos</span>
   </div>
 </header>
 
 <div class="shell">
+<aside>
+  <div class="sidebar-section">Flujo de trabajo</div>
+  <div class="step-item active" onclick="goTo(1)" id="sideStep1">
+    <div class="step-num">1</div>
+    <div><div class="step-label">Carteras asignadas</div><div class="step-sub">Uno o más archivos Excel</div></div>
+  </div>
+  <div class="step-item" onclick="goTo(2)" id="sideStep2">
+    <div class="step-num">2</div>
+    <div><div class="step-label">Base de pagos</div><div class="step-sub">Archivo con pagos registrados</div></div>
+  </div>
+  <div class="step-item" onclick="goTo(3)" id="sideStep3">
+    <div class="step-num">3</div>
+    <div><div class="step-label">Informe de gestión</div><div class="step-sub">Informe del sistema de cobranza</div></div>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="step-item" onclick="goTo(4)" id="sideStep4">
+    <div class="step-num">4</div>
+    <div><div class="step-label">Ejecutar cruce</div><div class="step-sub">Análisis y validación</div></div>
+  </div>
+  <div class="step-item" onclick="goTo(5)" id="sideStep5">
+    <div class="step-num">5</div>
+    <div><div class="step-label">Resultados</div><div class="step-sub">Descargar planillas</div></div>
+  </div>
+</aside>
 
-  <!-- ── Sidebar ── -->
-  <aside>
-    <div class="sidebar-section">Flujo de trabajo</div>
+<main>
 
-    <div class="step-item active" onclick="goTo(1)" id="sideStep1">
-      <div class="step-num">1</div>
-      <div>
-        <div class="step-label">Carteras asignadas</div>
-        <div class="step-sub">Uno o más archivos Excel</div>
-      </div>
+<!-- PASO 1 -->
+<div class="panel active" id="panel1">
+  <div class="panel-title">Carteras asignadas</div>
+  <div class="panel-desc">Carga una o varias carteras del 1° de mes. Se combinarán automáticamente.</div>
+  <div class="upload-zone" id="zoneCarteras" ondragover="onDragOver(event,'zoneCarteras')" ondragleave="onDragLeave('zoneCarteras')" ondrop="onDrop(event,'cartera')">
+    <input type="file" id="fileCarteras" accept=".xlsx,.xls,.csv" multiple onchange="handleCarteras(event)">
+    <div class="upload-icon">📂</div>
+    <h3>Arrastra los archivos de cartera aquí</h3>
+    <p>Formatos: .xlsx · .xls · .csv &nbsp;|&nbsp; Se permiten múltiples archivos</p>
+  </div>
+  <div class="file-list" id="fileTagsCarteras"></div>
+  <div id="resumenCarteras" style="display:none;margin-top:1.5rem;">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Archivos</div><div class="stat-value info" id="cntArchivos">0</div></div>
+      <div class="stat-card"><div class="stat-label">Total filas</div><div class="stat-value" id="cntRegistros">0</div></div>
+      <div class="stat-card"><div class="stat-label">IDs únicos</div><div class="stat-value ok" id="cntUnicos">0</div></div>
+      <div class="stat-card"><div class="stat-label">Duplicados</div><div class="stat-value warn" id="cntDupes">0</div></div>
     </div>
+    <div class="alert alert-info"><span>ℹ</span><span>Columna clave: <strong>ID_COBRANZA</strong>. Para el celular se usa la columna <strong>CELULAR</strong>.</span></div>
+  </div>
+  <div class="panel-nav">
+    <button class="btn btn-primary" onclick="goTo(2)" id="btnNextCarteras" disabled>Continuar →</button>
+  </div>
+</div>
 
-    <div class="step-item" onclick="goTo(2)" id="sideStep2">
-      <div class="step-num">2</div>
-      <div>
-        <div class="step-label">Base de pagos</div>
-        <div class="step-sub">Archivo con pagos registrados</div>
-      </div>
+<!-- PASO 2 -->
+<div class="panel" id="panel2">
+  <div class="panel-title">Base de pagos</div>
+  <div class="panel-desc">Archivo de pagos subido al sistema de cobranza.</div>
+  <div class="upload-zone" id="zonePagos" ondragover="onDragOver(event,'zonePagos')" ondragleave="onDragLeave('zonePagos')" ondrop="onDrop(event,'pagos')">
+    <input type="file" id="filePagos" accept=".xlsx,.xls,.csv" onchange="handlePagos(event)">
+    <div class="upload-icon">💳</div>
+    <h3>Arrastra la base de pagos aquí</h3>
+    <p>Columnas: Periodo · Producto · Id Cobranza · Ciudad · Importe · Fecha pago</p>
+  </div>
+  <div id="fileTagPagos"></div>
+  <div id="resumenPagos" style="display:none;margin-top:1.5rem;">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Pagos</div><div class="stat-value info" id="cntPagos">0</div></div>
+      <div class="stat-card"><div class="stat-label">Importe total</div><div class="stat-value ok" id="importeTotal">0</div></div>
+      <div class="stat-card"><div class="stat-label">En cartera</div><div class="stat-value ok" id="pagosEnCartera">—</div></div>
+      <div class="stat-card"><div class="stat-label">Fuera cartera</div><div class="stat-value warn" id="pagosFuera">—</div></div>
     </div>
+  </div>
+  <div class="panel-nav">
+    <button class="btn btn-ghost" onclick="goTo(1)">← Atrás</button>
+    <button class="btn btn-primary" onclick="goTo(3)" id="btnNextPagos" disabled>Continuar →</button>
+  </div>
+</div>
 
-    <div class="step-item" onclick="goTo(3)" id="sideStep3">
-      <div class="step-num">3</div>
-      <div>
-        <div class="step-label">Informe de gestión</div>
-        <div class="step-sub">Informe del sistema de cobranza</div>
-      </div>
+<!-- PASO 3 -->
+<div class="panel" id="panel3">
+  <div class="panel-title">Informe de gestión de cobranza</div>
+  <div class="panel-desc">Informe generado por el sistema de cobranza. Columnas clave: <code style="background:var(--c-surface2);padding:1px 5px;border-radius:3px;font-size:12px">ID CLIENTE</code> y <code style="background:var(--c-surface2);padding:1px 5px;border-radius:3px;font-size:12px">FECHA</code></div>
+  <div class="upload-zone" id="zoneInforme" ondragover="onDragOver(event,'zoneInforme')" ondragleave="onDragLeave('zoneInforme')" ondrop="onDrop(event,'informe')">
+    <input type="file" id="fileInforme" accept=".xlsx,.xls,.csv" onchange="handleInforme(event)">
+    <div class="upload-icon">📋</div>
+    <h3>Arrastra el informe de gestión aquí</h3>
+    <p>Columnas: PRODUCTO · ID CLIENTE · NOMBRE CLIENTE · FECHA · ETAPA · SUBETAPA · ACTIVIDAD · PRÓXIMO PASO · TELF TITULAR · TELF CONYUGE · CIUDAD</p>
+  </div>
+  <div id="fileTagInforme"></div>
+  <div id="resumenInforme" style="display:none;margin-top:1.5rem;">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Filas gestión</div><div class="stat-value info" id="cntGestion">0</div></div>
+      <div class="stat-card"><div class="stat-label">IDs únicos</div><div class="stat-value" id="cntGestionUnicos">0</div></div>
+      <div class="stat-card"><div class="stat-label">Rango fechas</div><div class="stat-value info" style="font-size:13px" id="fechaRango">—</div></div>
     </div>
+    <div class="alert alert-info"><span>ℹ</span><span>Se guardaron las columnas originales del informe. El archivo corregido mantendrá exactamente el mismo formato.</span></div>
+  </div>
+  <div class="panel-nav">
+    <button class="btn btn-ghost" onclick="goTo(2)">← Atrás</button>
+    <button class="btn btn-primary" onclick="goTo(4)" id="btnNextInforme" disabled>Continuar →</button>
+  </div>
+</div>
 
-    <div class="sidebar-divider"></div>
-
-    <div class="step-item" onclick="goTo(4)" id="sideStep4">
-      <div class="step-num">4</div>
-      <div>
-        <div class="step-label">Ejecutar cruce</div>
-        <div class="step-sub">Análisis y validación</div>
-      </div>
+<!-- PASO 4 -->
+<div class="panel" id="panel4">
+  <div class="panel-title">Ejecutar cruce</div>
+  <div class="panel-desc">Validación de las tres condiciones para el reconocimiento de comisión.</div>
+  <div class="process-card">
+    <h3>Reglas de validación</h3>
+    <div class="checklist" style="margin-top:.75rem;">
+      <div class="check-item"><span class="ci-icon">①</span><span class="ci-label">El ID de cobranza del pago debe existir en la cartera asignada</span></div>
+      <div class="check-item"><span class="ci-icon">②</span><span class="ci-label">El ID de cobranza/cliente debe aparecer en el informe de gestión</span></div>
+      <div class="check-item"><span class="ci-icon">③</span><span class="ci-label">La fecha de gestión debe ser igual o anterior a la fecha de pago (nunca posterior)</span></div>
     </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:1.5rem;align-items:center;">
+    <button class="btn btn-primary" onclick="ejecutarCruce()" id="btnCruce">⚡ Ejecutar cruce ahora</button>
+    <span style="font-size:12px;color:var(--c-text3)" id="cruceStatus"></span>
+  </div>
+  <div class="log-box" id="logBox" style="display:none"></div>
+  <div class="panel-nav">
+    <button class="btn btn-ghost" onclick="goTo(3)">← Atrás</button>
+    <button class="btn btn-primary" onclick="goTo(5)" id="btnNextCruce" disabled>Ver resultados →</button>
+  </div>
+</div>
 
-    <div class="step-item" onclick="goTo(5)" id="sideStep5">
-      <div class="step-num">5</div>
-      <div>
-        <div class="step-label">Resultados</div>
-        <div class="step-sub">Descargar planilla</div>
-      </div>
+<!-- PASO 5 -->
+<div class="panel" id="panel5">
+  <div class="panel-title">Resultados del cruce</div>
+  <div class="panel-desc">Análisis completo. Descarga las planillas según tu necesidad.</div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total pagos</div><div class="stat-value" id="rTotalPagos">—</div></div>
+    <div class="stat-card"><div class="stat-label">Con comisión OK</div><div class="stat-value ok" id="rOk">—</div></div>
+    <div class="stat-card"><div class="stat-label">Sin gestión</div><div class="stat-value err" id="rSinGestion">—</div></div>
+    <div class="stat-card"><div class="stat-label">Gestión posterior</div><div class="stat-value warn" id="rPosterior">—</div></div>
+    <div class="stat-card"><div class="stat-label">Fuera de cartera</div><div class="stat-value" id="rFueraCartera">—</div></div>
+  </div>
+
+  <div style="margin:1rem 0 1.5rem;">
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--c-text3);margin-bottom:4px;">
+      <span>Tasa de comisión reconocible</span><span id="tasaPct">—</span>
     </div>
-  </aside>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  </div>
 
-  <!-- ── Main ── -->
-  <main>
-
-    <!-- PASO 1: Carteras -->
-    <div class="panel active" id="panel1">
-      <div class="panel-title">Carteras asignadas</div>
-      <div class="panel-desc">Carga una o varias carteras del 1er día de mes. Se combinarán automáticamente.</div>
-
-      <div class="upload-zone" id="zoneCarteras" ondragover="onDragOver(event,'zoneCarteras')" ondragleave="onDragLeave('zoneCarteras')" ondrop="onDrop(event,'cartera')">
-        <input type="file" id="fileCarteras" accept=".xlsx,.xls,.csv" multiple onchange="handleCarteras(event)">
-        <div class="upload-icon">📂</div>
-        <h3>Arrastra los archivos de cartera aquí</h3>
-        <p>Formatos aceptados: .xlsx · .xls · .csv &nbsp;|&nbsp; Múltiples archivos permitidos</p>
-      </div>
-
-      <div class="file-list" id="fileTagsCarteras"></div>
-
-      <div id="resumenCarteras" style="display:none; margin-top:1.5rem;">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Archivos cargados</div>
-            <div class="stat-value info" id="cntArchivos">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Total registros</div>
-            <div class="stat-value" id="cntRegistros">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">IDs únicos</div>
-            <div class="stat-value ok" id="cntUnicos">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Duplicados</div>
-            <div class="stat-value warn" id="cntDupes">0</div>
-          </div>
-        </div>
-
-        <div class="alert alert-info">
-          <span>ℹ</span>
-          <span>Columna utilizada como clave: <strong>ID_COBRANZA</strong>. Asegúrate de que tus archivos tengan exactamente esa columna.</span>
-        </div>
-      </div>
-
-      <div class="panel-nav">
-        <button class="btn btn-primary" onclick="goTo(2)" id="btnNextCarteras" disabled>Continuar →</button>
-      </div>
+  <!-- DESCARGA 1: Informe corregido -->
+  <div class="download-box">
+    <h3>📄 Informe corregido para presentar a VIVA</h3>
+    <p>Es el <strong>informe de gestión original</strong> con las siguientes correcciones:<br>
+    — Se eliminan las filas que NO cumplen la condición (gestión posterior al pago).<br>
+    — Se dejan todas las filas que SÍ cumplen la condición.<br>
+    — Se crean filas nuevas para los códigos "Sin gestión" y "Gestión posterior", con la fecha del pago y los datos requeridos.<br>
+    — El resultado: <strong>exactamente 1 fila por código</strong> que cumple la condición.</p>
+    <div class="tag-row">
+      <span class="tag tag-ok">✔ Filas que cumplen condición → se conservan</span>
+      <span class="tag tag-warn">⚡ Gestión posterior → se crea fila nueva con fecha de pago</span>
+      <span class="tag tag-err">✚ Sin gestión → se crea fila nueva completa</span>
     </div>
+    <button class="btn btn-ok" onclick="descargarInformeCorregido()" id="btnInformeCorregido" disabled>
+      ⬇ Descargar Informe Corregido (.xlsx)
+    </button>
+    <span style="font-size:11px;color:var(--c-text3);margin-left:10px" id="notaInforme"></span>
+  </div>
 
-    <!-- PASO 2: Pagos -->
-    <div class="panel" id="panel2">
-      <div class="panel-title">Base de pagos</div>
-      <div class="panel-desc">Archivo de pagos que se sube al sistema de cobranza. Columna clave: <code style="background:var(--c-surface2);padding:1px 5px;border-radius:3px;font-size:12px">Id Cobranza</code></div>
+  <!-- DESCARGA 2: Solo observados -->
+  <div class="download-box">
+    <h3>📋 Planilla de códigos observados</h3>
+    <p>Lista de los códigos que necesitaron corrección (sin gestión + gestión posterior). Para tu control interno.</p>
+    <button class="btn btn-warn" onclick="descargarObservados()" id="btnDescarga" disabled>
+      ⬇ Descargar Observados (.xlsx)
+    </button>
+  </div>
 
-      <div class="upload-zone" id="zonePagos" ondragover="onDragOver(event,'zonePagos')" ondragleave="onDragLeave('zonePagos')" ondrop="onDrop(event,'pagos')">
-        <input type="file" id="filePagos" accept=".xlsx,.xls,.csv" onchange="handlePagos(event)">
-        <div class="upload-icon">💳</div>
-        <h3>Arrastra la base de pagos aquí</h3>
-        <p>Formato esperado: Periodo · Producto · Id Cobranza · Ciudad · Importe · Fecha pago</p>
-      </div>
+  <!-- DESCARGA 3: Registros OK -->
+  <div class="download-box">
+    <h3>✅ Registros con comisión reconocible</h3>
+    <p>Códigos que ya cumplían todas las condiciones sin modificación.</p>
+    <button class="btn btn-ghost" onclick="descargarExcelOk()" id="btnDescargaOk" disabled>
+      ⬇ Descargar Comisión OK (.xlsx)
+    </button>
+  </div>
 
-      <div id="fileTagPagos"></div>
+  <!-- Tabla previa -->
+  <div class="result-title">Vista previa — códigos observados</div>
+  <div class="table-wrap">
+    <table id="tablaObservados">
+      <thead>
+        <tr><th>#</th><th>ID Cobranza</th><th>Nombre</th><th>Fecha Pago</th><th>Importe</th><th>Motivo</th><th>Fecha Gestión orig.</th></tr>
+      </thead>
+      <tbody id="tbodyObservados">
+        <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--c-text3)">Ejecuta el cruce para ver resultados</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-      <div id="resumenPagos" style="display:none; margin-top:1.5rem;">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Pagos registrados</div>
-            <div class="stat-value info" id="cntPagos">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Importe total</div>
-            <div class="stat-value ok" id="importeTotal">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">En cartera</div>
-            <div class="stat-value ok" id="pagosEnCartera">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Fuera de cartera</div>
-            <div class="stat-value warn" id="pagosFuera">—</div>
-          </div>
-        </div>
-      </div>
+  <div class="panel-nav">
+    <button class="btn btn-ghost" onclick="goTo(4)">← Volver al cruce</button>
+    <button class="btn btn-ghost" onclick="reiniciar()">🔄 Nuevo análisis</button>
+  </div>
+</div>
 
-      <div class="panel-nav">
-        <button class="btn btn-ghost" onclick="goTo(1)">← Atrás</button>
-        <button class="btn btn-primary" onclick="goTo(3)" id="btnNextPagos" disabled>Continuar →</button>
-      </div>
-    </div>
-
-    <!-- PASO 3: Informe gestión -->
-    <div class="panel" id="panel3">
-      <div class="panel-title">Informe de gestión de cobranza</div>
-      <div class="panel-desc">Informe generado por el sistema de cobranza. Columnas clave: <code style="background:var(--c-surface2);padding:1px 5px;border-radius:3px;font-size:12px">ID CLIENTE</code> y <code style="background:var(--c-surface2);padding:1px 5px;border-radius:3px;font-size:12px">FECHA</code></div>
-
-      <div class="upload-zone" id="zoneInforme" ondragover="onDragOver(event,'zoneInforme')" ondragleave="onDragLeave('zoneInforme')" ondrop="onDrop(event,'informe')">
-        <input type="file" id="fileInforme" accept=".xlsx,.xls,.csv" onchange="handleInforme(event)">
-        <div class="upload-icon">📋</div>
-        <h3>Arrastra el informe de gestión aquí</h3>
-        <p>Formato: PRODUCTO · ID CLIENTE · NOMBRE CLIENTE · FECHA · ETAPA · SUBETAPA · ACTIVIDAD · etc.</p>
-      </div>
-
-      <div id="fileTagInforme"></div>
-
-      <div id="resumenInforme" style="display:none; margin-top:1.5rem;">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Registros gestión</div>
-            <div class="stat-value info" id="cntGestion">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">IDs únicos</div>
-            <div class="stat-value" id="cntGestionUnicos">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Rango de fechas</div>
-            <div class="stat-value info" style="font-size:13px" id="fechaRango">—</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel-nav">
-        <button class="btn btn-ghost" onclick="goTo(2)">← Atrás</button>
-        <button class="btn btn-primary" onclick="goTo(4)" id="btnNextInforme" disabled>Continuar →</button>
-      </div>
-    </div>
-
-    <!-- PASO 4: Cruce -->
-    <div class="panel" id="panel4">
-      <div class="panel-title">Ejecutar cruce</div>
-      <div class="panel-desc">Validación de las tres condiciones necesarias para el reconocimiento de comisión.</div>
-
-      <div class="process-card">
-        <h3>Reglas de validación</h3>
-        <div class="checklist" style="margin-top:0.75rem;">
-          <div class="check-item">
-            <span class="ci-icon">①</span>
-            <span class="ci-label">El ID de cobranza del pago debe existir en la cartera asignada</span>
-          </div>
-          <div class="check-item">
-            <span class="ci-icon">②</span>
-            <span class="ci-label">El ID de cobranza/cliente debe aparecer en el informe de gestión</span>
-          </div>
-          <div class="check-item">
-            <span class="ci-icon">③</span>
-            <span class="ci-label">La fecha de gestión debe ser igual o anterior a la fecha de pago (nunca posterior)</span>
-          </div>
-        </div>
-      </div>
-
-      <div id="preflightResult" style="display:none;">
-        <div class="result-title">Verificación previa</div>
-        <div class="checklist" id="preflightList"></div>
-      </div>
-
-      <div style="display:flex; gap:10px; margin-top:1.5rem; align-items:center;">
-        <button class="btn btn-primary" onclick="ejecutarCruce()" id="btnCruce">
-          ⚡ Ejecutar cruce ahora
-        </button>
-        <span style="font-size:12px; color:var(--c-text3)" id="cruceStatus"></span>
-      </div>
-
-      <div class="log-box" id="logBox" style="display:none"></div>
-
-      <div class="panel-nav">
-        <button class="btn btn-ghost" onclick="goTo(3)">← Atrás</button>
-        <button class="btn btn-primary" onclick="goTo(5)" id="btnNextCruce" disabled>Ver resultados →</button>
-      </div>
-    </div>
-
-    <!-- PASO 5: Resultados -->
-    <div class="panel" id="panel5">
-      <div class="panel-title">Resultados del cruce</div>
-      <div class="panel-desc">Análisis completo. Descarga la planilla de códigos observados para su revisión.</div>
-
-      <div class="stats-grid" id="resultStats">
-        <div class="stat-card">
-          <div class="stat-label">Total pagos</div>
-          <div class="stat-value" id="rTotalPagos">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Con comisión OK</div>
-          <div class="stat-value ok" id="rOk">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Sin gestión</div>
-          <div class="stat-value err" id="rSinGestion">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Gestión posterior</div>
-          <div class="stat-value warn" id="rPosterior">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Fuera de cartera</div>
-          <div class="stat-value err" id="rFueraCartera">—</div>
-        </div>
-      </div>
-
-      <!-- Barra de éxito -->
-      <div style="margin:1.5rem 0;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--c-text3);margin-bottom:4px;">
-          <span>Tasa de comisión reconocible</span>
-          <span id="tasaPct">—</span>
-        </div>
-        <div class="progress-wrap">
-          <div class="progress-bar" id="progressBar" style="width:0%"></div>
-        </div>
-      </div>
-
-      <!-- Tabla detalle observados -->
-      <div class="result-title">Códigos observados (sin comisión)</div>
-
-      <div style="display:flex; gap:10px; margin-bottom:1rem; align-items:center; flex-wrap:wrap;">
-        <button class="btn btn-ok" onclick="descargarExcel()" id="btnDescarga" disabled>
-          ⬇ Descargar planilla Excel
-        </button>
-        <button class="btn btn-ghost" onclick="descargarExcelOk()" id="btnDescargaOk" disabled>
-          ⬇ Descargar registros OK
-        </button>
-        <span style="font-size:12px;color:var(--c-text3)" id="descargaNote"></span>
-      </div>
-
-      <div class="table-wrap">
-        <table id="tablaObservados">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>ID Cobranza</th>
-              <th>Nombre Cliente</th>
-              <th>Fecha Pago</th>
-              <th>Importe</th>
-              <th>Motivo</th>
-              <th>Fecha Gestión</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyObservados">
-            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--c-text3)">Ejecuta el cruce para ver los resultados</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="panel-nav">
-        <button class="btn btn-ghost" onclick="goTo(4)">← Volver al cruce</button>
-        <button class="btn btn-ghost" onclick="reiniciar()">🔄 Nuevo análisis</button>
-      </div>
-    </div>
-
-  </main>
+</main>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 // ESTADO GLOBAL
-// ═══════════════════════════════════════════════════════
-const state = {
-  carteras: [],        // [{filename, rows:[]}]
-  carteraMap: {},      // id_cobranza -> row
-  pagos: [],           // rows
-  informe: [],         // rows
-  resultados: [],
-  resultadosOk: [],
-  currentPanel: 1
+// ═══════════════════════════════════════
+const S = {
+  carteras: [],
+  carteraMap: {},    // id_cobranza -> fila cartera
+  pagos: [],
+  pagoMap: {},       // id_cobranza -> fila pago (ultimo)
+  informe: [],
+  informeHeaders: [], // columnas originales del informe
+  gestionMap: {},    // id_cliente -> [{ fecha, fila_original }]
+  resultados: [],    // observados (sin gestión + posterior)
+  resultadosOk: [],  // ok
+  informeCorregido: [] // filas finales para descargar
 };
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 // NAVEGACIÓN
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 function goTo(n) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel' + n).classList.add('active');
-
-  document.querySelectorAll('.step-item').forEach((el, i) => {
+  document.getElementById('panel'+n).classList.add('active');
+  document.querySelectorAll('.step-item').forEach((el,i) => {
     el.classList.remove('active');
-    if (i + 1 < n) el.classList.add('done');
-    else el.classList.remove('done');
+    if (i+1 < n) el.classList.add('done'); else el.classList.remove('done');
   });
-  document.getElementById('sideStep' + n).classList.add('active');
-  state.currentPanel = n;
+  document.getElementById('sideStep'+n).classList.add('active');
 }
 
-// ═══════════════════════════════════════════════════════
-// DRAG & DROP helpers
-// ═══════════════════════════════════════════════════════
-function onDragOver(e, zoneId) {
+// ═══════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════
+function onDragOver(e,z){e.preventDefault();document.getElementById(z).classList.add('drag-over');}
+function onDragLeave(z){document.getElementById(z).classList.remove('drag-over');}
+function onDrop(e,tipo){
   e.preventDefault();
-  document.getElementById(zoneId).classList.add('drag-over');
-}
-function onDragLeave(zoneId) {
-  document.getElementById(zoneId).classList.remove('drag-over');
-}
-function onDrop(e, tipo) {
-  e.preventDefault();
-  const zoneId = tipo === 'cartera' ? 'zoneCarteras' : tipo === 'pagos' ? 'zonePagos' : 'zoneInforme';
-  document.getElementById(zoneId).classList.remove('drag-over');
-  const files = e.dataTransfer.files;
-  if (tipo === 'cartera') procesarCarteras(files);
-  else if (tipo === 'pagos') procesarPagos(files[0]);
+  const zMap={cartera:'zoneCarteras',pagos:'zonePagos',informe:'zoneInforme'};
+  document.getElementById(zMap[tipo]).classList.remove('drag-over');
+  const files=e.dataTransfer.files;
+  if(tipo==='cartera') procesarCarteras(files);
+  else if(tipo==='pagos') procesarPagos(files[0]);
   else procesarInforme(files[0]);
 }
 
-// ═══════════════════════════════════════════════════════
-// LEER EXCEL / CSV → array de objetos
-// ═══════════════════════════════════════════════════════
-function leerArchivo(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const wb = XLSX.read(e.target.result, { type: 'binary', cellDates: true });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
-        resolve(rows);
-      } catch (err) { reject(err); }
+// ═══════════════════════════════════════
+// LEER ARCHIVO
+// ═══════════════════════════════════════
+function leerArchivo(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      try{
+        const wb=XLSX.read(e.target.result,{type:'binary',cellDates:true});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+        // Guardar headers originales
+        const headers=XLSX.utils.sheet_to_json(ws,{header:1,defval:''})[0]||[];
+        res({rows,headers});
+      }catch(err){rej(err);}
     };
-    reader.onerror = reject;
-    reader.readAsBinaryString(file);
+    r.onerror=rej;
+    r.readAsBinaryString(file);
   });
 }
 
-// Normaliza clave (elimina espacios, mayúsculas)
-function normKey(k) {
-  return String(k || '').trim().toUpperCase().replace(/\s+/g, '_');
-}
+function normKey(k){return String(k||'').trim().toUpperCase().replace(/\s+/g,'_');}
 
-// Obtiene valor por nombre de columna flexible
-function getCol(row, ...names) {
-  for (const n of names) {
-    const k = Object.keys(row).find(c => normKey(c) === normKey(n));
-    if (k !== undefined) return row[k];
+function getCol(row,...names){
+  for(const n of names){
+    const k=Object.keys(row).find(c=>normKey(c)===normKey(n));
+    if(k!==undefined) return row[k];
   }
   return '';
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 // PASO 1 – CARTERAS
-// ═══════════════════════════════════════════════════════
-function handleCarteras(e) { procesarCarteras(e.target.files); }
+// ═══════════════════════════════════════
+function handleCarteras(e){procesarCarteras(e.target.files);}
 
-async function procesarCarteras(files) {
-  const tagsEl = document.getElementById('fileTagsCarteras');
-
-  for (const file of files) {
-    try {
-      const rows = await leerArchivo(file);
-      state.carteras.push({ filename: file.name, rows });
-
-      const tag = document.createElement('div');
-      tag.className = 'file-tag';
-      tag.innerHTML = `<span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${rows.length} filas)</span>`;
+async function procesarCarteras(files){
+  const tagsEl=document.getElementById('fileTagsCarteras');
+  for(const file of files){
+    try{
+      const {rows}=await leerArchivo(file);
+      S.carteras.push({filename:file.name,rows});
+      const tag=document.createElement('div');
+      tag.className='file-tag';
+      tag.innerHTML=`<span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${rows.length} filas)</span>`;
       tagsEl.appendChild(tag);
-    } catch (err) {
-      addTag(tagsEl, file.name + ' — error de lectura', 'warn');
+    }catch(err){
+      const tag=document.createElement('div');
+      tag.className='file-tag';
+      tag.innerHTML=`<span class="dot dot-warn"></span>${file.name} — error`;
+      tagsEl.appendChild(tag);
     }
   }
-
   reconstruirCarteraMap();
 }
 
-function reconstruirCarteraMap() {
-  state.carteraMap = {};
-  let total = 0;
-  let dupes = 0;
-
-  for (const c of state.carteras) {
-    for (const row of c.rows) {
-      const id = String(getCol(row, 'ID_COBRANZA', 'ID COBRANZA', 'IDCOBRANZA') || '').trim();
-      if (!id) continue;
+function reconstruirCarteraMap(){
+  S.carteraMap={};
+  let total=0,dupes=0;
+  for(const c of S.carteras){
+    for(const row of c.rows){
+      const id=String(getCol(row,'ID_COBRANZA','ID COBRANZA','IDCOBRANZA')||'').trim();
+      if(!id) continue;
       total++;
-      if (state.carteraMap[id]) dupes++;
-      else state.carteraMap[id] = row;
+      if(S.carteraMap[id]) dupes++;
+      else S.carteraMap[id]=row;
     }
   }
-
-  const unicos = Object.keys(state.carteraMap).length;
-
-  document.getElementById('cntArchivos').textContent = state.carteras.length;
-  document.getElementById('cntRegistros').textContent = total.toLocaleString();
-  document.getElementById('cntUnicos').textContent = unicos.toLocaleString();
-  document.getElementById('cntDupes').textContent = dupes.toLocaleString();
-  document.getElementById('resumenCarteras').style.display = 'block';
-  document.getElementById('btnNextCarteras').disabled = unicos === 0;
-
-  if (unicos > 0) updateStatus('Cartera lista · ' + unicos + ' IDs');
+  const unicos=Object.keys(S.carteraMap).length;
+  document.getElementById('cntArchivos').textContent=S.carteras.length;
+  document.getElementById('cntRegistros').textContent=total.toLocaleString();
+  document.getElementById('cntUnicos').textContent=unicos.toLocaleString();
+  document.getElementById('cntDupes').textContent=dupes.toLocaleString();
+  document.getElementById('resumenCarteras').style.display='block';
+  document.getElementById('btnNextCarteras').disabled=unicos===0;
+  if(unicos>0) updateStatus('Cartera lista · '+unicos+' IDs');
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 // PASO 2 – PAGOS
-// ═══════════════════════════════════════════════════════
-function handlePagos(e) { procesarPagos(e.target.files[0]); }
+// ═══════════════════════════════════════
+function handlePagos(e){procesarPagos(e.target.files[0]);}
 
-async function procesarPagos(file) {
-  if (!file) return;
-  try {
-    state.pagos = await leerArchivo(file);
-    const tagEl = document.getElementById('fileTagPagos');
-    tagEl.innerHTML = `<div class="file-tag"><span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${state.pagos.length} filas)</span></div>`;
-
-    let importe = 0;
-    let enCartera = 0;
-    for (const p of state.pagos) {
-      const imp = parseFloat(getCol(p, 'Importe', 'IMPORTE', 'importe') || 0);
-      importe += isNaN(imp) ? 0 : imp;
-      const id = String(getCol(p, 'Id Cobranza', 'ID_COBRANZA', 'IDCOBRANZA', 'id cobranza') || '').trim();
-      if (state.carteraMap[id]) enCartera++;
+async function procesarPagos(file){
+  if(!file) return;
+  try{
+    const {rows}=await leerArchivo(file);
+    S.pagos=rows;
+    S.pagoMap={};
+    let importe=0,enCartera=0;
+    for(const p of S.pagos){
+      const id=String(getCol(p,'Id Cobranza','ID_COBRANZA','IDCOBRANZA','id cobranza')||'').trim();
+      if(id) S.pagoMap[id]=p;
+      const imp=parseFloat(getCol(p,'Importe','IMPORTE','importe')||0);
+      importe+=isNaN(imp)?0:imp;
+      if(S.carteraMap[id]) enCartera++;
     }
-
-    document.getElementById('cntPagos').textContent = state.pagos.length.toLocaleString();
-    document.getElementById('importeTotal').textContent = importe.toLocaleString('es-BO', { style: 'currency', currency: 'BOB', maximumFractionDigits: 2 });
-    document.getElementById('pagosEnCartera').textContent = enCartera.toLocaleString();
-    document.getElementById('pagosFuera').textContent = (state.pagos.length - enCartera).toLocaleString();
-    document.getElementById('resumenPagos').style.display = 'block';
-    document.getElementById('btnNextPagos').disabled = false;
-    updateStatus('Pagos listos · ' + state.pagos.length);
-  } catch (err) {
-    alert('Error leyendo base de pagos: ' + err.message);
-  }
+    document.getElementById('fileTagPagos').innerHTML=
+      `<div class="file-tag"><span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${rows.length} filas)</span></div>`;
+    document.getElementById('cntPagos').textContent=rows.length.toLocaleString();
+    document.getElementById('importeTotal').textContent=importe.toLocaleString('es-BO',{style:'currency',currency:'BOB',maximumFractionDigits:2});
+    document.getElementById('pagosEnCartera').textContent=enCartera.toLocaleString();
+    document.getElementById('pagosFuera').textContent=(rows.length-enCartera).toLocaleString();
+    document.getElementById('resumenPagos').style.display='block';
+    document.getElementById('btnNextPagos').disabled=false;
+    updateStatus('Pagos listos · '+rows.length);
+  }catch(err){alert('Error leyendo base de pagos: '+err.message);}
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 // PASO 3 – INFORME GESTIÓN
-// ═══════════════════════════════════════════════════════
-function handleInforme(e) { procesarInforme(e.target.files[0]); }
+// ═══════════════════════════════════════
+function handleInforme(e){procesarInforme(e.target.files[0]);}
 
-async function procesarInforme(file) {
-  if (!file) return;
-  try {
-    state.informe = await leerArchivo(file);
-    const tagEl = document.getElementById('fileTagInforme');
-    tagEl.innerHTML = `<div class="file-tag"><span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${state.informe.length} filas)</span></div>`;
-
-    // Construir mapa id_cliente -> fechas de gestión (puede haber varias)
-    state.gestionMap = {};
-    let fechas = [];
-    for (const g of state.informe) {
-      const id = String(getCol(g, 'ID CLIENTE', 'ID_CLIENTE', 'IDCLIENTE') || '').trim();
-      const rawFecha = getCol(g, 'FECHA', 'fecha');
-      const fecha = parseDate(rawFecha);
-      if (!id) continue;
-      if (!state.gestionMap[id]) state.gestionMap[id] = [];
-      state.gestionMap[id].push(fecha);
-      if (fecha) fechas.push(fecha);
+async function procesarInforme(file){
+  if(!file) return;
+  try{
+    const {rows,headers}=await leerArchivo(file);
+    S.informe=rows;
+    S.informeHeaders=headers;
+    S.gestionMap={};
+    const fechas=[];
+    for(const g of rows){
+      const id=String(getCol(g,'ID CLIENTE','ID_CLIENTE','IDCLIENTE')||'').trim();
+      const rawF=getCol(g,'FECHA','fecha');
+      const fecha=parseDate(rawF);
+      if(!id) continue;
+      if(!S.gestionMap[id]) S.gestionMap[id]=[];
+      S.gestionMap[id].push({fecha,fila:g});
+      if(fecha) fechas.push(fecha);
     }
-
-    const unicos = Object.keys(state.gestionMap).length;
-    document.getElementById('cntGestion').textContent = state.informe.length.toLocaleString();
-    document.getElementById('cntGestionUnicos').textContent = unicos.toLocaleString();
-
-    if (fechas.length) {
-      fechas.sort((a, b) => a - b);
-      const fmt = d => d ? d.toLocaleDateString('es-BO') : '?';
-      document.getElementById('fechaRango').textContent = fmt(fechas[0]) + ' → ' + fmt(fechas[fechas.length - 1]);
+    const unicos=Object.keys(S.gestionMap).length;
+    document.getElementById('fileTagInforme').innerHTML=
+      `<div class="file-tag"><span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${rows.length} filas)</span></div>`;
+    document.getElementById('cntGestion').textContent=rows.length.toLocaleString();
+    document.getElementById('cntGestionUnicos').textContent=unicos.toLocaleString();
+    if(fechas.length){
+      fechas.sort((a,b)=>a-b);
+      const fmt=d=>d?d.toLocaleDateString('es-BO'):'?';
+      document.getElementById('fechaRango').textContent=fmt(fechas[0])+' → '+fmt(fechas[fechas.length-1]);
     }
-
-    document.getElementById('resumenInforme').style.display = 'block';
-    document.getElementById('btnNextInforme').disabled = false;
-    updateStatus('Informe listo · ' + state.informe.length + ' gestiones');
-  } catch (err) {
-    alert('Error leyendo informe de gestión: ' + err.message);
-  }
+    document.getElementById('resumenInforme').style.display='block';
+    document.getElementById('btnNextInforme').disabled=false;
+    updateStatus('Informe listo · '+rows.length+' gestiones');
+  }catch(err){alert('Error leyendo informe: '+err.message);}
 }
 
-// ═══════════════════════════════════════════════════════
-// UTILITARIO: parsear fechas flexiblemente
-// ═══════════════════════════════════════════════════════
-function parseDate(val) {
-  if (!val) return null;
-  if (val instanceof Date) return isNaN(val) ? null : val;
-  if (typeof val === 'number') {
-    // Excel serial
-    const d = new Date((val - 25569) * 86400000);
-    return isNaN(d) ? null : d;
-  }
-  const s = String(val).trim();
-  // formatos comunes: DD/MM/YYYY, YYYY-MM-DD, DD-MM-YYYY
+// ═══════════════════════════════════════
+// UTILIDADES FECHA
+// ═══════════════════════════════════════
+function parseDate(val){
+  if(!val) return null;
+  if(val instanceof Date) return isNaN(val)?null:val;
+  if(typeof val==='number'){const d=new Date((val-25569)*86400000);return isNaN(d)?null:d;}
+  const s=String(val).trim();
   let m;
-  m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
-  m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
-  m = s.match(/^(\d{2})-(\d{2})-(\d{4})/);
-  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
-  const d = new Date(s);
-  return isNaN(d) ? null : d;
+  m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);if(m) return new Date(+m[3],+m[2]-1,+m[1]);
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+  m=s.match(/^(\d{2})-(\d{2})-(\d{4})/);if(m) return new Date(+m[3],+m[2]-1,+m[1]);
+  const d=new Date(s);return isNaN(d)?null:d;
 }
+function stripTime(d){if(!d) return null;return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function fmtFecha(d){if(!d) return '';return d.toLocaleDateString('es-BO');}
+function excelDateSerial(d){if(!d) return '';return Math.floor((d-new Date(Date.UTC(1899,11,30)))/86400000);}
 
-function stripTime(d) {
-  if (!d) return null;
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
-
-// ═══════════════════════════════════════════════════════
-// PASO 4 – CRUCE
-// ═══════════════════════════════════════════════════════
-function ejecutarCruce() {
-  const log = document.getElementById('logBox');
-  log.style.display = 'block';
-  log.innerHTML = '';
-
-  function addLog(msg, tipo) {
-    const line = document.createElement('div');
-    if (tipo) line.className = 'log-line-' + tipo;
-    line.textContent = msg;
-    log.appendChild(line);
-    log.scrollTop = log.scrollHeight;
+// ═══════════════════════════════════════
+// PASO 4 – CRUCE PRINCIPAL
+// ═══════════════════════════════════════
+function ejecutarCruce(){
+  const log=document.getElementById('logBox');
+  log.style.display='block';log.innerHTML='';
+  function addLog(msg,tipo){
+    const line=document.createElement('div');
+    if(tipo) line.className='log-line-'+tipo;
+    line.textContent=msg;log.appendChild(line);log.scrollTop=log.scrollHeight;
   }
 
   addLog('▶ Iniciando cruce...');
-  addLog('  Carteras: ' + Object.keys(state.carteraMap).length + ' IDs');
-  addLog('  Pagos: ' + state.pagos.length + ' registros');
-  addLog('  Gestiones: ' + (state.gestionMap ? Object.keys(state.gestionMap).length : 0) + ' IDs únicos');
+  addLog('  Carteras: '+Object.keys(S.carteraMap).length+' IDs');
+  addLog('  Pagos: '+S.pagos.length+' registros');
+  addLog('  Gestiones: '+Object.keys(S.gestionMap).length+' IDs únicos');
 
-  state.resultados = [];
-  state.resultadosOk = [];
+  S.resultados=[];S.resultadosOk=[];S.informeCorregido=[];
 
-  let cOk = 0, cSinGestion = 0, cPosterior = 0, cFueraCartera = 0;
+  // Columnas del informe (para armar fila nueva con mismo formato)
+  const cols=S.informeHeaders.length>0?S.informeHeaders:
+    ['PRODUCTO','ID CLIENTE','NOMBRE CLIENTE','FECHA','ETAPA','SUBETAPA','ACTIVIDAD','PRÓXIMO PASO','TELF TITULAR','TELF CONYUGE','CIUDAD'];
 
-  for (const pago of state.pagos) {
-    const idCobranza = String(getCol(pago, 'Id Cobranza', 'ID_COBRANZA', 'IDCOBRANZA', 'id cobranza') || '').trim();
-    const idCliente = String(getCol(pago, 'Id Cliente', 'ID_CLIENTE', 'IDCLIENTE', 'Producto') || idCobranza).trim();
-    const rawFechaPago = getCol(pago, 'Fecha pago', 'FECHA_PAGO', 'fecha pago', 'FECHAPAGO');
-    const fechaPago = stripTime(parseDate(rawFechaPago));
-    const nombre = String(getCol(pago, 'Nombre', 'NOMBRE', 'Nombre Cliente') || '').trim();
-    const importe = getCol(pago, 'Importe', 'IMPORTE');
+  // Mapa: id_cliente -> filas del informe
+  // Para el informe corregido, primero armamos un set de filas que se quedan (las que cumplen)
+  // y luego agregamos filas nuevas para los que no.
+
+  let cOk=0,cSinGestion=0,cPosterior=0,cFuera=0;
+
+  // IDs de pagos que ya procesamos para no duplicar en el informe corregido
+  const idsCorregidos=new Set();
+
+  for(const pago of S.pagos){
+    const idCob=String(getCol(pago,'Id Cobranza','ID_COBRANZA','IDCOBRANZA','id cobranza')||'').trim();
+    const rawFechaPago=getCol(pago,'Fecha pago','FECHA_PAGO','fecha pago','FECHAPAGO');
+    const fechaPago=stripTime(parseDate(rawFechaPago));
+    const importe=getCol(pago,'Importe','IMPORTE');
 
     // Regla 1: ¿está en cartera?
-    const enCartera = !!state.carteraMap[idCobranza];
-    if (!enCartera) {
-      cFueraCartera++;
-      state.resultados.push({
-        idCobranza, nombre: nombre || getCarteraNombre(idCobranza),
-        fechaPago: fechaPago ? fechaPago.toLocaleDateString('es-BO') : '—',
-        importe,
-        motivo: 'Fuera de cartera',
-        fechaGestion: '—'
-      });
+    const carteraRow=S.carteraMap[idCob];
+    if(!carteraRow){
+      cFuera++;
+      // Los "fuera de cartera" NO se incluyen en el informe corregido ni en observados
       continue;
     }
 
-    // Obtener ID cliente desde cartera para buscar en gestión
-    const carteraRow = state.carteraMap[idCobranza];
-    const idClienteCartera = String(getCol(carteraRow, 'ID_CLIENTE', 'ID CLIENTE') || idCobranza).trim();
-    const nombreCartera = String(getCol(carteraRow, 'NOMBRE_CLIENTE', 'NOMBRE CLIENTE', 'REPRESENTANTE_LEGAL') || '').trim();
+    const idCliente=String(getCol(carteraRow,'ID_CLIENTE','ID CLIENTE')||idCob).trim();
+    const nombreCliente=String(getCol(carteraRow,'NOMBRE_CLIENTE','NOMBRE CLIENTE','REPRESENTANTE_LEGAL')||'').trim();
+    const celular=String(getCol(carteraRow,'CELULAR','celular')||'').trim();
+    const producto=String(getCol(carteraRow,'PRODUCTO','producto')||'').trim();
+    const ciudad=String(getCol(carteraRow,'CIUDAD','ciudad')||'').trim();
 
-    // Regla 2: ¿tiene gestión en el informe?
-    const gestiones = (state.gestionMap || {})[idClienteCartera] || (state.gestionMap || {})[idCobranza] || [];
-    if (!gestiones.length) {
-      cSinGestion++;
-      state.resultados.push({
-        idCobranza, nombre: nombreCartera,
-        fechaPago: fechaPago ? fechaPago.toLocaleDateString('es-BO') : '—',
-        importe,
-        motivo: 'Sin gestión en informe',
-        fechaGestion: '—'
-      });
-      continue;
-    }
+    // Buscar gestiones para este ID cliente
+    const gestiones=S.gestionMap[idCliente]||S.gestionMap[idCob]||[];
 
-    // Regla 3: ¿existe al menos una gestión con fecha <= fecha de pago?
-    let mejorGestion = null;
-    let hayGestionAnterior = false;
+    // Verificar si alguna gestión tiene fecha <= fechaPago
+    let filaValida=null;
+    let hayGestionAnterior=false;
 
-    if (!fechaPago) {
-      // Sin fecha de pago, tomar la gestión más reciente como referencia
-      gestiones.sort((a, b) => (b || 0) - (a || 0));
-      mejorGestion = gestiones[0];
-      hayGestionAnterior = true; // sin fecha pago no podemos validar
+    if(!fechaPago){
+      // Sin fecha de pago: tomamos la gestión más reciente
+      if(gestiones.length>0){
+        const sorted=[...gestiones].filter(g=>g.fecha).sort((a,b)=>b.fecha-a.fecha);
+        filaValida=sorted.length>0?sorted[0].fila:gestiones[gestiones.length-1].fila;
+        hayGestionAnterior=true;
+      }
     } else {
-      // Buscar gestión con fecha <= fechaPago
-      for (const fg of gestiones) {
-        const fgs = stripTime(fg);
-        if (fgs && fgs <= fechaPago) {
-          if (!mejorGestion || fgs > mejorGestion) mejorGestion = fgs;
-          hayGestionAnterior = true;
+      // Con fecha de pago: buscamos la gestión más reciente que sea <= fechaPago
+      let mejorFecha=null;
+      for(const g of gestiones){
+        const fg=stripTime(g.fecha);
+        if(fg && fg<=fechaPago){
+          hayGestionAnterior=true;
+          if(!mejorFecha||fg>mejorFecha){
+            mejorFecha=fg;
+            filaValida=g.fila;
+          }
         }
       }
     }
 
-    if (hayGestionAnterior) {
+    idsCorregidos.add(idCob);
+
+    if(hayGestionAnterior && filaValida){
+      // ✅ CASO OK: tiene gestión válida anterior o igual al pago
       cOk++;
-      state.resultadosOk.push({
-        idCobranza, nombre: nombreCartera,
-        fechaPago: fechaPago ? fechaPago.toLocaleDateString('es-BO') : '—',
-        importe,
-        motivo: 'Comisión reconocible',
-        fechaGestion: mejorGestion ? mejorGestion.toLocaleDateString('es-BO') : '—'
-      });
+      S.resultadosOk.push({idCob,nombre:nombreCliente,fechaPago:fechaPago?fmtFecha(fechaPago):'—',importe,motivo:'Comisión reconocible',fechaGestion:filaValida?fmtFecha(stripTime(parseDate(getCol(filaValida,'FECHA','fecha')))):'—'});
+      // Agregar la fila válida al informe corregido (la que cumple la condición)
+      S.informeCorregido.push({...filaValida, _tipo:'ok'});
     } else {
-      cPosterior++;
-      const ultG = gestiones.filter(Boolean).sort((a, b) => b - a)[0];
-      state.resultados.push({
-        idCobranza, nombre: nombreCartera,
-        fechaPago: fechaPago ? fechaPago.toLocaleDateString('es-BO') : '—',
-        importe,
-        motivo: 'Gestión posterior al pago',
-        fechaGestion: ultG ? ultG.toLocaleDateString('es-BO') : '—'
-      });
+      // ❌ CASO OBSERVADO: sin gestión O gestión posterior
+      const motivo=gestiones.length===0?'Sin gestión en informe':'Gestión posterior al pago';
+      const fechaGestionOrig=gestiones.length>0?(gestiones.filter(g=>g.fecha).sort((a,b)=>b.fecha-a.fecha)[0]?.fecha||null):null;
+
+      if(gestiones.length>0) cPosterior++; else cSinGestion++;
+
+      S.resultados.push({idCob,idCliente,nombre:nombreCliente,fechaPago:fechaPago?fmtFecha(fechaPago):'—',fechaPagoDate:fechaPago,importe,motivo,fechaGestion:fechaGestionOrig?fmtFecha(fechaGestionOrig):'—',celular,producto,ciudad});
+
+      // Construir FILA NUEVA para el informe corregido
+      const filaBase=gestiones.length>0?gestiones[gestiones.length-1].fila:{};
+      const filaNueva={};
+
+      // Recorrer las columnas originales del informe y asignar valores
+      for(const col of cols){
+        const ck=normKey(col);
+        if(ck==='PRODUCTO'){
+          // NO HACER NADA: se mantiene el valor original si existe
+          filaNueva[col]=getCol(filaBase,'PRODUCTO','producto')||producto||'';
+        } else if(ck==='ID_CLIENTE'||col==='ID CLIENTE'){
+          filaNueva[col]=idCliente;
+        } else if(ck==='NOMBRE_CLIENTE'||col==='NOMBRE CLIENTE'){
+          filaNueva[col]=nombreCliente;
+        } else if(ck==='FECHA'){
+          // FECHA DEL PAGO
+          filaNueva[col]=fechaPago?excelDateSerial(fechaPago):'';
+        } else if(ck==='ETAPA'){
+          const etapaActual=String(getCol(filaBase,'ETAPA','etapa')||'').trim();
+          filaNueva[col]=etapaActual.toUpperCase().includes('COMPROMISO DE PAGO')?etapaActual:'01. COMPROMISO DE PAGO';
+        } else if(ck==='SUBETAPA'){
+          const subActual=String(getCol(filaBase,'SUBETAPA','subetapa')||'').trim();
+          // Si ya contiene "DIAS" o "DÍAS" no hacer nada
+          filaNueva[col]=/D[IÍ]AS/i.test(subActual)?subActual:'DIAS';
+        } else if(ck==='ACTIVIDAD'){
+          filaNueva[col]=(celular?celular+' ':'')+' SE HABLO CON EL/LA TITULAR PASARA A CANCELAR';
+        } else if(ck==='PRÓXIMO_PASO'||col==='PRÓXIMO PASO'||col==='PROXIMO PASO'){
+          const proxActual=String(getCol(filaBase,'PRÓXIMO PASO','PROXIMO PASO','próximo paso','proximo paso')||'').trim();
+          filaNueva[col]=proxActual.toUpperCase().includes('VERIFICAR PAGO')?proxActual:'VERIFICAR PAGO';
+        } else if(ck==='TELF_TITULAR'||col==='TELF TITULAR'){
+          filaNueva[col]=getCol(filaBase,'TELF TITULAR','TELF_TITULAR')||'';
+        } else if(ck==='TELF_CONYUGE'||col==='TELF CONYUGE'){
+          filaNueva[col]=getCol(filaBase,'TELF CONYUGE','TELF_CONYUGE')||'';
+        } else if(ck==='CIUDAD'){
+          filaNueva[col]=getCol(filaBase,'CIUDAD','ciudad')||ciudad||'';
+        } else {
+          filaNueva[col]=getCol(filaBase,col)||'';
+        }
+      }
+      filaNueva._tipo='nuevo';
+      S.informeCorregido.push(filaNueva);
     }
   }
 
-  const total = state.pagos.length;
-  const pct = total > 0 ? Math.round((cOk / total) * 100) : 0;
-
   addLog('');
-  addLog('✔ Cruce completado.', 'ok');
-  addLog('  Con comisión: ' + cOk, 'ok');
-  addLog('  Sin gestión: ' + cSinGestion, cSinGestion > 0 ? 'err' : '');
-  addLog('  Gestión posterior: ' + cPosterior, cPosterior > 0 ? 'warn' : '');
-  addLog('  Fuera de cartera: ' + cFueraCartera, cFueraCartera > 0 ? 'err' : '');
-  addLog('  Tasa reconocible: ' + pct + '%');
+  addLog('✔ Cruce completado.','ok');
+  addLog('  Con comisión: '+cOk,'ok');
+  addLog('  Sin gestión: '+cSinGestion,cSinGestion>0?'err':'');
+  addLog('  Gestión posterior: '+cPosterior,cPosterior>0?'warn':'');
+  addLog('  Fuera de cartera (ignorados): '+cFuera);
+  addLog('  Filas en informe corregido: '+S.informeCorregido.length,'ok');
 
-  // Rellenar panel 5
-  document.getElementById('rTotalPagos').textContent = total.toLocaleString();
-  document.getElementById('rOk').textContent = cOk.toLocaleString();
-  document.getElementById('rSinGestion').textContent = cSinGestion.toLocaleString();
-  document.getElementById('rPosterior').textContent = cPosterior.toLocaleString();
-  document.getElementById('rFueraCartera').textContent = cFueraCartera.toLocaleString();
-  document.getElementById('tasaPct').textContent = pct + '%';
-  document.getElementById('progressBar').style.width = pct + '%';
+  const total=S.pagos.length-cFuera;
+  const pct=total>0?Math.round((cOk/total)*100):0;
+
+  document.getElementById('rTotalPagos').textContent=(S.pagos.length).toLocaleString();
+  document.getElementById('rOk').textContent=cOk.toLocaleString();
+  document.getElementById('rSinGestion').textContent=cSinGestion.toLocaleString();
+  document.getElementById('rPosterior').textContent=cPosterior.toLocaleString();
+  document.getElementById('rFueraCartera').textContent=cFuera.toLocaleString();
+  document.getElementById('tasaPct').textContent=pct+'%';
+  document.getElementById('progressBar').style.width=pct+'%';
+
+  const nObs=S.resultados.length;
+  document.getElementById('notaInforme').textContent=
+    S.informeCorregido.length+' filas en total ('+cOk+' originales + '+nObs+' creadas)';
+
+  document.getElementById('btnInformeCorregido').disabled=S.informeCorregido.length===0;
+  document.getElementById('btnDescarga').disabled=nObs===0;
+  document.getElementById('btnDescargaOk').disabled=S.resultadosOk.length===0;
 
   renderTablaObservados();
-
-  document.getElementById('btnNextCruce').disabled = false;
-  document.getElementById('btnDescarga').disabled = state.resultados.length === 0;
-  document.getElementById('btnDescargaOk').disabled = state.resultadosOk.length === 0;
-  document.getElementById('descargaNote').textContent =
-    state.resultados.length + ' observados · ' + state.resultadosOk.length + ' OK';
-
-  updateStatus('Cruce listo · ' + pct + '% reconocible');
+  document.getElementById('btnNextCruce').disabled=false;
   document.getElementById('statusDot').classList.add('ready');
+  updateStatus('Cruce listo · '+pct+'% reconocible');
 }
 
-function getCarteraNombre(id) {
-  const r = state.carteraMap[id];
-  if (!r) return '';
-  return String(getCol(r, 'NOMBRE_CLIENTE', 'NOMBRE CLIENTE', 'REPRESENTANTE_LEGAL') || '');
-}
-
-// ═══════════════════════════════════════════════════════
-// TABLA OBSERVADOS
-// ═══════════════════════════════════════════════════════
-function renderTablaObservados() {
-  const tbody = document.getElementById('tbodyObservados');
-  if (!state.resultados.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--c-ok)">✔ Todos los pagos tienen comisión reconocible</td></tr>';
+// ═══════════════════════════════════════
+// TABLA PREVIA
+// ═══════════════════════════════════════
+function renderTablaObservados(){
+  const tbody=document.getElementById('tbodyObservados');
+  if(!S.resultados.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--c-ok)">✔ Todos los pagos tienen comisión reconocible — sin observados</td></tr>';
     return;
   }
-  tbody.innerHTML = state.resultados.slice(0, 200).map((r, i) => {
-    const motivoClass = r.motivo.includes('posterior') ? 'badge-warn' :
-                        r.motivo.includes('cartera') ? 'badge-err' : 'badge-err';
-    return `<tr>
-      <td style="color:var(--c-text3)">${i + 1}</td>
-      <td style="color:var(--c-text)">${r.idCobranza}</td>
-      <td>${r.nombre || '—'}</td>
-      <td>${r.fechaPago}</td>
-      <td>${r.importe || '—'}</td>
-      <td><span class="badge ${motivoClass}">${r.motivo}</span></td>
-      <td>${r.fechaGestion}</td>
-    </tr>`;
+  tbody.innerHTML=S.resultados.slice(0,200).map((r,i)=>{
+    const mc=r.motivo.includes('posterior')?'badge-warn':'badge-err';
+    return `<tr><td style="color:var(--c-text3)">${i+1}</td><td style="color:var(--c-text)">${r.idCob}</td><td>${r.nombre||'—'}</td><td>${r.fechaPago}</td><td>${r.importe||'—'}</td><td><span class="badge ${mc}">${r.motivo}</span></td><td>${r.fechaGestion}</td></tr>`;
   }).join('');
-  if (state.resultados.length > 200) {
-    tbody.innerHTML += `<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--c-text3)">… y ${state.resultados.length - 200} más — descarga el Excel para ver todos</td></tr>`;
+  if(S.resultados.length>200){
+    tbody.innerHTML+=`<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--c-text3)">… y ${S.resultados.length-200} más — descarga el Excel para ver todos</td></tr>`;
   }
 }
 
-// ═══════════════════════════════════════════════════════
-// DESCARGAR EXCEL OBSERVADOS
-// ═══════════════════════════════════════════════════════
-function descargarExcel() {
-  if (!state.resultados.length) return;
+// ═══════════════════════════════════════
+// DESCARGAR INFORME CORREGIDO
+// ═══════════════════════════════════════
+function descargarInformeCorregido(){
+  if(!S.informeCorregido.length) return;
+  const hoy=new Date().toLocaleDateString('es-BO').replace(/\//g,'-');
+  const wb=XLSX.utils.book_new();
 
-  const hoy = new Date().toLocaleDateString('es-BO').replace(/\//g, '-');
-  const wb = XLSX.utils.book_new();
+  // Usar las columnas originales del informe (sin _tipo)
+  const cols=S.informeHeaders.length>0?S.informeHeaders:
+    ['PRODUCTO','ID CLIENTE','NOMBRE CLIENTE','FECHA','ETAPA','SUBETAPA','ACTIVIDAD','PRÓXIMO PASO','TELF TITULAR','TELF CONYUGE','CIUDAD'];
 
-  // Hoja 1: Observados
-  const wsData = [
-    ['ID Cobranza', 'Nombre Cliente', 'Fecha Pago', 'Importe', 'Motivo Observación', 'Fecha Gestión']
-  ];
-  for (const r of state.resultados) {
-    wsData.push([r.idCobranza, r.nombre, r.fechaPago, r.importe, r.motivo, r.fechaGestion]);
+  // Armar array: header + filas
+  const wsData=[cols];
+  for(const fila of S.informeCorregido){
+    const row=cols.map(col=>{
+      const val=fila[col];
+      // Si es número y la columna es FECHA, SheetJS lo tomará como serial de fecha
+      return val===undefined?'':val;
+    });
+    wsData.push(row);
   }
-  const ws = XLSX.utils.aoa_to_sheet(wsData);
-  ws['!cols'] = [{ wch: 18 }, { wch: 30 }, { wch: 14 }, { wch: 12 }, { wch: 28 }, { wch: 14 }];
-  XLSX.utils.book_append_sheet(wb, ws, 'Observados');
 
-  // Hoja 2: Resumen
-  const wsRes = XLSX.utils.aoa_to_sheet([
-    ['Resumen de cruce — ' + hoy],
+  const ws=XLSX.utils.aoa_to_sheet(wsData);
+
+  // Formatear la columna FECHA como fecha
+  const fechaColIdx=cols.findIndex(c=>normKey(c)==='FECHA');
+  if(fechaColIdx>=0){
+    const fechaLetter=XLSX.utils.encode_col(fechaColIdx);
+    for(let r=2;r<=wsData.length;r++){
+      const ref=fechaLetter+r;
+      if(ws[ref] && typeof ws[ref].v==='number'){
+        ws[ref].t='n';
+        ws[ref].z='DD/MM/YYYY';
+      }
+    }
+  }
+
+  // Anchos de columna
+  ws['!cols']=cols.map(c=>{
+    const ck=normKey(c);
+    if(ck==='ACTIVIDAD') return {wch:60};
+    if(ck==='NOMBRE_CLIENTE'||c==='NOMBRE CLIENTE') return {wch:30};
+    if(ck==='ETAPA') return {wch:25};
+    if(ck==='SUBETAPA') return {wch:15};
+    return {wch:16};
+  });
+
+  XLSX.utils.book_append_sheet(wb,ws,'Informe Corregido');
+
+  // Hoja 2: leyenda de cambios
+  const wsCamb=XLSX.utils.aoa_to_sheet([
+    ['Resumen de cambios — '+hoy],
     [],
-    ['Total pagos procesados', state.pagos.length],
-    ['Con comisión reconocible', state.resultadosOk.length],
-    ['Observados (sin comisión)', state.resultados.length],
-    ['  Sin gestión en informe', state.resultados.filter(r => r.motivo.includes('Sin gestión')).length],
-    ['  Gestión posterior al pago', state.resultados.filter(r => r.motivo.includes('posterior')).length],
-    ['  Fuera de cartera', state.resultados.filter(r => r.motivo.includes('cartera')).length],
-    ['Tasa reconocible', state.pagos.length > 0 ? (state.resultadosOk.length / state.pagos.length * 100).toFixed(2) + '%' : '—']
+    ['Tipo de fila','Cantidad'],
+    ['Filas originales que cumplen la condición',S.resultadosOk.length],
+    ['Filas nuevas creadas (sin gestión)',S.resultados.filter(r=>r.motivo.includes('Sin gestión')).length],
+    ['Filas nuevas creadas (gestión posterior)',S.resultados.filter(r=>r.motivo.includes('posterior')).length],
+    ['Total filas en informe corregido',S.informeCorregido.length],
+    [],
+    ['Reglas aplicadas en filas nuevas',''],
+    ['FECHA','Fecha del pago extraída de la base de pagos'],
+    ['ETAPA','01. COMPROMISO DE PAGO (si no tenía esa leyenda)'],
+    ['SUBETAPA','DIAS (si no lo tenía)'],
+    ['ACTIVIDAD','[Celular] SE HABLO CON EL/LA TITULAR PASARA A CANCELAR'],
+    ['PRÓXIMO PASO','VERIFICAR PAGO (si no lo tenía)'],
   ]);
-  wsRes['!cols'] = [{ wch: 32 }, { wch: 12 }];
-  XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen');
+  wsCamb['!cols']=[{wch:45},{wch:20}];
+  XLSX.utils.book_append_sheet(wb,wsCamb,'Leyenda de Cambios');
 
-  XLSX.writeFile(wb, 'Observados_Cruce_' + hoy + '.xlsx');
+  XLSX.writeFile(wb,'InformeCorregido_'+hoy+'.xlsx');
 }
 
-function descargarExcelOk() {
-  if (!state.resultadosOk.length) return;
-  const hoy = new Date().toLocaleDateString('es-BO').replace(/\//g, '-');
-  const wb = XLSX.utils.book_new();
-  const wsData = [
-    ['ID Cobranza', 'Nombre Cliente', 'Fecha Pago', 'Importe', 'Estado', 'Fecha Gestión']
-  ];
-  for (const r of state.resultadosOk) {
-    wsData.push([r.idCobranza, r.nombre, r.fechaPago, r.importe, r.motivo, r.fechaGestion]);
+// ═══════════════════════════════════════
+// DESCARGAR OBSERVADOS
+// ═══════════════════════════════════════
+function descargarObservados(){
+  if(!S.resultados.length) return;
+  const hoy=new Date().toLocaleDateString('es-BO').replace(/\//g,'-');
+  const wb=XLSX.utils.book_new();
+  const wsData=[['ID Cobranza','ID Cliente','Nombre Cliente','Fecha Pago','Importe','Motivo Observación','Fecha Gestión Original','Celular']];
+  for(const r of S.resultados){
+    wsData.push([r.idCob,r.idCliente||'',r.nombre,r.fechaPago,r.importe,r.motivo,r.fechaGestion,r.celular||'']);
   }
-  const ws = XLSX.utils.aoa_to_sheet(wsData);
-  ws['!cols'] = [{ wch: 18 }, { wch: 30 }, { wch: 14 }, { wch: 12 }, { wch: 24 }, { wch: 14 }];
-  XLSX.utils.book_append_sheet(wb, ws, 'Con Comisión OK');
-  XLSX.writeFile(wb, 'ComisionOK_' + hoy + '.xlsx');
+  const ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols']=[{wch:18},{wch:18},{wch:30},{wch:14},{wch:12},{wch:28},{wch:18},{wch:16}];
+  XLSX.utils.book_append_sheet(wb,ws,'Observados');
+  XLSX.writeFile(wb,'Observados_'+hoy+'.xlsx');
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
+// DESCARGAR OK
+// ═══════════════════════════════════════
+function descargarExcelOk(){
+  if(!S.resultadosOk.length) return;
+  const hoy=new Date().toLocaleDateString('es-BO').replace(/\//g,'-');
+  const wb=XLSX.utils.book_new();
+  const wsData=[['ID Cobranza','Nombre Cliente','Fecha Pago','Importe','Estado','Fecha Gestión']];
+  for(const r of S.resultadosOk) wsData.push([r.idCob,r.nombre,r.fechaPago,r.importe,r.motivo,r.fechaGestion]);
+  const ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols']=[{wch:18},{wch:30},{wch:14},{wch:12},{wch:24},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws,'Comisión OK');
+  XLSX.writeFile(wb,'ComisionOK_'+hoy+'.xlsx');
+}
+
+// ═══════════════════════════════════════
 // UTILIDADES UI
-// ═══════════════════════════════════════════════════════
-function updateStatus(msg) {
-  document.getElementById('statusText').textContent = msg;
-}
-
-function reiniciar() {
-  if (!confirm('¿Reiniciar y limpiar todos los datos cargados?')) return;
-  location.reload();
-}
-
-function addTag(container, name, tipo) {
-  const tag = document.createElement('div');
-  tag.className = 'file-tag';
-  tag.innerHTML = `<span class="dot dot-${tipo}"></span>${name}`;
-  container.appendChild(tag);
-}
+// ═══════════════════════════════════════
+function updateStatus(msg){document.getElementById('statusText').textContent=msg;}
+function reiniciar(){if(!confirm('¿Reiniciar y limpiar todos los datos?')) return;location.reload();}
 </script>
 </body>
 </html>
