@@ -315,7 +315,7 @@ function leerArchivo(file){
     const r=new FileReader();
     r.onload=e=>{
       try{
-        const wb=XLSX.read(e.target.result,{type:'binary',cellDates:true});
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
 
         // Recorrer TODAS las hojas y elegir la que tenga más filas con datos
         let mejorWs=null, mejorCant=-1, mejorNombre='';
@@ -327,23 +327,20 @@ function leerArchivo(file){
           if(cant>mejorCant){mejorCant=cant;mejorWs=ws;mejorNombre=nombre;}
         }
 
-        if(!mejorWs||mejorCant<=1){
-          rej(new Error(
-            'El archivo "'+file.name+'" no tiene datos.\n'+
-            'Hojas encontradas: '+wb.SheetNames.join(', ')+'\n'+
-            'Verifica que el archivo no esté vacío o protegido.'
-          ));
+        if(!mejorWs){
+          rej(new Error('No se pudo leer el archivo "'+file.name+'". Hojas: '+wb.SheetNames.join(', ')));
           return;
         }
 
-        const rows=XLSX.utils.sheet_to_json(mejorWs,{defval:''});
+        const rows=XLSX.utils.sheet_to_json(mejorWs,{defval:'',raw:false});
         const headers=(XLSX.utils.sheet_to_json(mejorWs,{header:1,defval:''})[0]||[]).map(h=>String(h));
-        console.log('['+file.name+'] Hoja seleccionada: "'+mejorNombre+'" ('+rows.length+' filas)');
+        console.log('['+file.name+'] Hoja: "'+mejorNombre+'" → '+rows.length+' filas');
         res({rows,headers,hojaNombre:mejorNombre});
       }catch(err){rej(err);}
     };
     r.onerror=rej;
-    r.readAsBinaryString(file);
+    // ArrayBuffer es más robusto que BinaryString para archivos grandes (>10MB)
+    r.readAsArrayBuffer(file);
   });
 }
 
@@ -534,7 +531,12 @@ function ejecutarCruce(){
     if(!carteraRow){ cFuera++; L('  FUERA (ignorado): '+idCob); continue; }
 
     const nombreCliente=String(gc(carteraRow,'NOMBRE_CLIENTE','NOMBRE CLIENTE','REPRESENTANTE_LEGAL')||'').trim();
-    const celular=String(gc(carteraRow,'CELULAR','celular')||'').trim();
+    // Si CELULAR tiene formato 'IDxxxxx' (código interno, no teléfono real),
+    // usar REFERENCIA1 como número de contacto para la ACTIVIDAD
+    let celular=String(gc(carteraRow,'CELULAR','celular')||'').trim();
+    if(/^ID\d+$/i.test(celular)){
+      celular=String(gc(carteraRow,'REFERENCIA1','referencia1','NRO_PROPIO_01')||'').trim()||celular;
+    }
     const productoCart=String(gc(carteraRow,'PRODUCTO','producto')||'').trim();
     const ciudadCart=String(gc(carteraRow,'CIUDAD','ciudad')||'').trim();
 
