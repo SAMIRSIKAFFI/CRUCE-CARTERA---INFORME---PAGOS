@@ -623,12 +623,38 @@ function ejecutarCruce(){
     ['PRODUCTO','ID CLIENTE','NOMBRE CLIENTE','FECHA','ETAPA','SUBETAPA',
      'ACTIVIDAD','PRÓXIMO PASO','TELF TITULAR','TELF CONYUGE','CIUDAD'];
 
-  let cOk=0,cSinGest=0,cPosterior=0,cFuera=0;
+  // ETAPAS que VIVA reconoce como válidas para el pago de comisión
+  const ETAPAS_VALIDAS = /^(01\.|02\.|05\.)/i;
+
+  // ── DEDUPLICACIÓN DE PAGOS ─────────────────────────────────────
+  // Si un mismo ID_COBRANZA tiene varios pagos, solo se procesa
+  // el más antiguo (primera fecha de pago). Los demás se ignoran.
+  // Esto evita filas duplicadas en el informe corregido.
+  const pagosPorCodigo = {}; // idCob → pago con fecha más antigua
 
   for(const pago of S.pagos){
     const idCob=String(gc(pago,'Id Cobranza','ID_COBRANZA','IDCOBRANZA','id cobranza')||'').trim();
+    if(!idCob) continue;
     const rawFP=gc(pago,'Fecha pago','FECHA_PAGO','fecha pago','FECHAPAGO');
     const fechaPago=soloFecha(parseFecha(rawFP));
+
+    if(!pagosPorCodigo[idCob]){
+      pagosPorCodigo[idCob]={pago, fechaPago};
+    } else {
+      // Quedarse con el pago de fecha más antigua
+      const fechaExistente=pagosPorCodigo[idCob].fechaPago;
+      if(fechaPago && (!fechaExistente || fechaPago < fechaExistente)){
+        pagosPorCodigo[idCob]={pago, fechaPago};
+      }
+    }
+  }
+
+  L('  Pagos únicos (deduplicados): '+Object.keys(pagosPorCodigo).length.toLocaleString(),'info');
+
+  let cOk=0,cSolo2=0,cEtapaInv=0,cPosterior=0,cSinGest=0,cFuera=0;
+
+  for(const idCob of Object.keys(pagosPorCodigo)){
+    const {pago, fechaPago}=pagosPorCodigo[idCob];
     const importe=gc(pago,'Importe','IMPORTE');
 
     // Regla 1: ¿está en cartera?
@@ -638,76 +664,45 @@ function ejecutarCruce(){
     const nombreCliente=String(gc(carteraRow,'NOMBRE_CLIENTE','NOMBRE CLIENTE','REPRESENTANTE_LEGAL')||'').trim();
     const productoCart=String(gc(carteraRow,'PRODUCTO','producto')||'').trim();
     const ciudadCart=String(gc(carteraRow,'CIUDAD','ciudad')||'').trim();
-
-    // Obtener celular — limpiar prefijo I/M/P si existe
     const celularRaw=String(gc(carteraRow,'CELULAR','celular')||'').trim();
     const celular=limpiarCelular(celularRaw);
 
-    // Regla 2 y 3: buscar gestión válida
+    // Buscar gestiones en el informe para este código
+    // ID CLIENTE del informe = ID_COBRANZA de la cartera
     const gestiones=S.gestionMap[idCob]||[];
-    let mejorIdx=null,hayAnterior=false;
 
-    if(!fechaPago){
-      if(gestiones.length>0){
-        const sorted=[...gestiones].filter(g=>g.fecha).sort((a,b)=>b.fecha-a.fecha);
-        mejorIdx=sorted.length>0?sorted[0].filaIdx:gestiones[gestiones.length-1].filaIdx;
-        hayAnterior=true;
-      }
-    }else{
-      let mejorFecha=null;
-      for(const g of gestiones){
-        const fg=soloFecha(g.fecha);
-        // Condición: fecha gestión <= fecha pago (incluye día anterior y mismo día)
-        if(fg&&fg<=fechaPago){
-          hayAnterior=true;
-          if(!mejorFecha||fg>mejorFecha){mejorFecha=fg;mejorIdx=g.filaIdx;}
-        }
+    // Encontrar la gestión más reciente con fecha <= fechaPago
+    let mejorIdx=null, mejorFecha=null;
+    for(const g of gestiones){
+      const fg=soloFecha(g.fecha);
+      if(fg && (!fechaPago || fg<=fechaPago)){
+        if(!mejorFecha||fg>mejorFecha){mejorFecha=fg;mejorIdx=g.filaIdx;}
       }
     }
 
-    if(hayAnterior&&mejorIdx!==null){
-      // ══ OK: conservar fila original ══
-      cOk++;
-      const filaOrig=S.informe[mejorIdx];
-      const fgOrig=fmtFecha(soloFecha(parseFecha(gc(filaOrig,'FECHA','fecha'))));
-      S.resultadosOk.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,motivo:'Comisión reconocible',fechaGestion:fgOrig});
-      S.planCorr.push({tipo:'ok',filaIdx:mejorIdx,idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,fechaGestion:fgOrig});
+    const hayGestionAnterior = mejorIdx!==null;
 
-    }else{
-      // ══ OBSERVADO: crear fila nueva ══
-      const motivo=gestiones.length===0?'Sin gestión en informe':'Gestión posterior al pago';
-      if(gestiones.length>0)cPosterior++;else cSinGest++;
-      const ultGest=gestiones.filter(g=>g.fecha).sort((a,b)=>b.fecha-a.fecha)[0];
-      const fgOrig=ultGest?fmtFecha(soloFecha(ultGest.fecha)):'—';
-
-      S.resultados.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),fechaPagoDate:fechaPago,importe,motivo,fechaGestion:fgOrig,celular});
-
-      const filaBase=gestiones.length>0?S.informe[gestiones[gestiones.length-1].filaIdx]:{};
-
-      // Construir fila nueva con claves exactas del header
+    // ── Función para construir fila nueva completa (casos 3, 4, 5) ──
+    const construirFilaNueva = (filaBase) => {
       const datos={};
       for(const col of cols){
         const ck=nk(col);
         if(ck==='PRODUCTO'){
           datos[col]=gc(filaBase,'PRODUCTO','producto')||productoCart||'';
         }else if(ck==='ID_CLIENTE'){
-          datos[col]=idCob; // ID_COBRANZA = ID CLIENTE del informe
+          datos[col]=idCob;
         }else if(ck==='NOMBRE_CLIENTE'){
           datos[col]=nombreCliente;
         }else if(ck==='FECHA'){
           datos[col]=fechaPago?serialExcel(fechaPago):'';
         }else if(ck==='ETAPA'){
-          const actual=String(gc(filaBase,'ETAPA','etapa')||'').trim();
-          datos[col]=/COMPROMISO\s+DE\s+PAGO/i.test(actual)?actual:'01. COMPROMISO DE PAGO';
+          datos[col]='01. COMPROMISO DE PAGO';
         }else if(ck==='SUBETAPA'){
-          const actual=String(gc(filaBase,'SUBETAPA','subetapa')||'').trim();
-          datos[col]=/D[IÍ]AS/i.test(actual)?actual:'DIAS';
+          datos[col]='DIAS';
         }else if(ck==='ACTIVIDAD'){
-          // Celular limpio + leyenda
           datos[col]=(celular?celular+' ':'')+' SE HABLO CON EL/LA TITULAR PASARA A CANCELAR';
         }else if(ck==='PRÓXIMO_PASO'){
-          const actual=String(gc(filaBase,'PRÓXIMO PASO','PROXIMO PASO','próximo paso','proximo paso')||'').trim();
-          datos[col]=/VERIFICAR\s+PAGO/i.test(actual)?actual:'VERIFICAR PAGO';
+          datos[col]='VERIFICAR PAGO';
         }else if(ck==='TELF_TITULAR'){
           datos[col]=gc(filaBase,'TELF TITULAR','TELF_TITULAR')||'';
         }else if(ck==='TELF_CONYUGE'){
@@ -718,30 +713,136 @@ function ejecutarCruce(){
           datos[col]=gc(filaBase,col)||'';
         }
       }
+      return datos;
+    };
 
-      S.planCorr.push({tipo:'nuevo',datos,idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,motivo,fechaGestion:fgOrig,celular});
+    if(hayGestionAnterior){
+      // Hay gestión con fecha válida (anterior o igual al pago)
+      const filaOrig=S.informe[mejorIdx];
+      const etapaOrig=String(gc(filaOrig,'ETAPA','etapa')||'').trim();
+      const proxOrig=String(gc(filaOrig,'PRÓXIMO PASO','PROXIMO PASO','próximo paso','proximo paso')||'').trim();
+      const fgOrig=fmtFecha(mejorFecha);
+
+      if(ETAPAS_VALIDAS.test(etapaOrig)){
+        // ETAPA válida para VIVA (01, 02, 05)
+        if(/VERIFICAR\s+PAGO/i.test(proxOrig)){
+          // ══ CASO 1: Todo correcto — copiar fila sin cambio ══
+          cOk++;
+          S.resultadosOk.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,
+            motivo:'CASO 1 — Sin cambio',fechaGestion:fgOrig,caso:1});
+          S.planCorr.push({tipo:'ok',filaIdx:mejorIdx,idCob,nombre:nombreCliente,
+            fechaPago:fmtFecha(fechaPago),importe,fechaGestion:fgOrig,caso:1,
+            casoDesc:'SIN CAMBIO — gestión válida y completa'});
+        } else {
+          // ══ CASO 2: ETAPA válida pero PRÓXIMO PASO incorrecto ══
+          // Solo corregir PRÓXIMO PASO, todo lo demás intacto
+          cSolo2++;
+          S.resultados.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,
+            motivo:'CASO 2 — Solo corregir PRÓXIMO PASO',fechaGestion:fgOrig,celular,caso:2});
+          S.planCorr.push({tipo:'caso2',filaIdx:mejorIdx,idCob,nombre:nombreCliente,
+            fechaPago:fmtFecha(fechaPago),importe,fechaGestion:fgOrig,caso:2,
+            casoDesc:'PRÓXIMO PASO corregido a VERIFICAR PAGO (resto intacto)'});
+        }
+      } else {
+        // ══ CASO 3: ETAPA NO válida (03, 04) — cliente pagó pese al contacto fallido ══
+        // Reemplazar fila completa con valores corregidos
+        cEtapaInv++;
+        const filaBase=filaOrig;
+        const datos=construirFilaNueva(filaBase);
+        S.resultados.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,
+          motivo:'CASO 3 — Etapa inválida ('+etapaOrig+')',fechaGestion:fgOrig,celular,caso:3});
+        S.planCorr.push({tipo:'nuevo',datos,idCob,nombre:nombreCliente,
+          fechaPago:fmtFecha(fechaPago),importe,motivo:'CASO 3 — Etapa inválida: '+etapaOrig,
+          fechaGestion:fgOrig,celular,caso:3,
+          casoDesc:'FILA REEMPLAZADA — etapa inválida ('+etapaOrig+')'});
+      }
+
+    } else {
+      // No hay gestión con fecha válida
+      const ultGest=gestiones.filter(g=>g.fecha).sort((a,b)=>b.fecha-a.fecha)[0];
+      const fgOrig=ultGest?fmtFecha(soloFecha(ultGest.fecha)):'—';
+      const filaBase=ultGest?S.informe[ultGest.filaIdx]:{};
+
+      if(gestiones.length===0){
+        // ══ CASO 5: Sin ninguna gestión ══
+        cSinGest++;
+        const datos=construirFilaNueva({});
+        S.resultados.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,
+          motivo:'CASO 5 — Sin gestión en informe',fechaGestion:'—',celular,caso:5});
+        S.planCorr.push({tipo:'nuevo',datos,idCob,nombre:nombreCliente,
+          fechaPago:fmtFecha(fechaPago),importe,motivo:'CASO 5 — Sin gestión',
+          fechaGestion:'—',celular,caso:5,
+          casoDesc:'FILA CREADA — no existía en el informe'});
+      } else {
+        // ══ CASO 4: Gestión existe pero es posterior al pago ══
+        cPosterior++;
+        const datos=construirFilaNueva(filaBase);
+        S.resultados.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,
+          motivo:'CASO 4 — Gestión posterior al pago ('+fgOrig+')',fechaGestion:fgOrig,celular,caso:4});
+        S.planCorr.push({tipo:'nuevo',datos,idCob,nombre:nombreCliente,
+          fechaPago:fmtFecha(fechaPago),importe,motivo:'CASO 4 — Gestión posterior al pago',
+          fechaGestion:fgOrig,celular,caso:4,
+          casoDesc:'FILA REEMPLAZADA — gestión posterior al pago ('+fgOrig+')'});
+      }
     }
   }
 
+  // ── AGREGAR FILAS DEL INFORME SIN PAGO ───────────────────────
+  // Todas las filas del informe original que NO corresponden a un pago
+  // se copian al informe corregido SIN NINGÚN CAMBIO.
+  // Esto incluye gestiones efectivas (01, 02, 05) y fallidas (03, 04)
+  // que simplemente no tienen pago registrado.
+
+  // Construir set de índices de filas que ya fueron usadas en planCorr
+  const filasUsadas = new Set();
+  for(const plan of S.planCorr){
+    if(plan.filaIdx !== undefined && plan.filaIdx !== null){
+      filasUsadas.add(plan.filaIdx);
+    }
+  }
+
+  // Agregar todas las filas del informe que NO fueron tocadas
+  let cSinPago = 0;
+  S.informe.forEach((fila, idx) => {
+    if(!filasUsadas.has(idx)){
+      S.planCorr.push({
+        tipo: 'original',
+        filaIdx: idx,
+        caso: 0,
+        casoDesc: 'SIN PAGO — fila original conservada intacta'
+      });
+      cSinPago++;
+    }
+  });
+
+  L('  Filas sin pago (conservadas)        : '+cSinPago.toLocaleString(),'info');
+
   L('══ RESUMEN ══════════════════════','info');
-  L('  Con comisión OK     : '+cOk.toLocaleString(),'ok');
-  L('  Sin gestión (creado): '+cSinGest.toLocaleString(),cSinGest>0?'err':'');
-  L('  Gestión posterior   : '+cPosterior.toLocaleString(),cPosterior>0?'warn':'');
-  L('  Fuera de cartera    : '+cFuera.toLocaleString()+' (ignorados)');
-  L('  Filas informe final : '+S.planCorr.length.toLocaleString(),'ok');
+  L('  CASO 1 — Sin cambio (todo OK)       : '+cOk.toLocaleString(),'ok');
+  L('  CASO 2 — Solo corregir PRÓXIMO PASO : '+cSolo2.toLocaleString(),cSolo2>0?'warn':'ok');
+  L('  CASO 3 — Etapa inválida (03/04)     : '+cEtapaInv.toLocaleString(),cEtapaInv>0?'warn':'ok');
+  L('  CASO 4 — Gestión posterior al pago  : '+cPosterior.toLocaleString(),cPosterior>0?'warn':'ok');
+  L('  CASO 5 — Sin gestión (fila nueva)   : '+cSinGest.toLocaleString(),cSinGest>0?'err':'ok');
+  L('  Fuera de cartera (ignorados)         : '+cFuera.toLocaleString());
+  L('  Pagos duplicados ignorados           : '+(S.pagos.length-Object.keys(pagosPorCodigo).length).toLocaleString());
+  L('  Filas en informe corregido           : '+S.planCorr.length.toLocaleString(),'ok');
 
-  const total=S.pagos.length-cFuera;
-  const pct=total>0?Math.round((cOk/total)*100):0;
+  const totalUnicos=Object.keys(pagosPorCodigo).length-cFuera;
+  const totalReconocibles=cOk+cSolo2; // casos 1 y 2 ya cumplen la condición
+  const pct=totalUnicos>0?Math.round((totalReconocibles/totalUnicos)*100):0;
 
-  document.getElementById('rTotalPagos').textContent=S.pagos.length.toLocaleString();
+  document.getElementById('rTotalPagos').textContent=Object.keys(pagosPorCodigo).length.toLocaleString()+
+    ' ('+S.pagos.length.toLocaleString()+' brutos)';
   document.getElementById('rOk').textContent=cOk.toLocaleString();
   document.getElementById('rSinGestion').textContent=cSinGest.toLocaleString();
-  document.getElementById('rPosterior').textContent=cPosterior.toLocaleString();
+  document.getElementById('rPosterior').textContent=(cPosterior+cEtapaInv+cSolo2).toLocaleString();
   document.getElementById('rFueraCartera').textContent=cFuera.toLocaleString();
   document.getElementById('tasaPct').textContent=pct+'%';
   document.getElementById('progressBar').style.width=pct+'%';
   document.getElementById('notaInforme').textContent=
-    S.planCorr.length.toLocaleString()+' filas ('+cOk.toLocaleString()+' sin cambio + '+(cSinGest+cPosterior).toLocaleString()+' corregidas)';
+    S.planCorr.length.toLocaleString()+' filas — '+
+    cOk+' sin cambio · '+cSolo2+' solo próx.paso · '+
+    cEtapaInv+' etapa inválida · '+cPosterior+' posterior · '+cSinGest+' sin gestión';
 
   document.getElementById('btnInformeCorregido').disabled=S.planCorr.length===0;
   document.getElementById('btnDescarga').disabled=S.resultados.length===0;
@@ -787,14 +888,55 @@ function descargarInformeCorregido(){
 
   // ── PESTAÑA 1: INFORME COMPLETO ────────────────────────────────
   const data=[cols];
+  // Precalcular mapa de columnas del informe original para acceso exacto
+  // Esto resuelve el problema de ETAPA/SUBETAPA/PRÓXIMO PASO que se perdían
+  // porque gc() no encontraba la clave exacta con acentos o espacios.
+  //
+  // Estrategia: para cada col del header, buscar la clave exacta en la primera
+  // fila del informe original y guardarla. Así la lectura es directa y sin pérdida.
+  const colKeyMap = {}; // col_del_header → clave_exacta_en_S.informe[n]
+  if(S.informe.length > 0){
+    const primerFila = S.informe[0];
+    for(const col of cols){
+      // 1. Buscar clave exacta (igual al header)
+      if(col in primerFila){ colKeyMap[col] = col; continue; }
+      // 2. Buscar por normalización
+      const colNorm = nk(col);
+      const found = Object.keys(primerFila).find(k => nk(k) === colNorm);
+      if(found){ colKeyMap[col] = found; continue; }
+      // 3. No se encontró → clave nula
+      colKeyMap[col] = null;
+    }
+  }
+
   for(const plan of S.planCorr){
-    if(plan.tipo==='ok'){
+
+    if(plan.tipo==='original' || plan.tipo==='ok'){
+      // CASO 0 (sin pago) y CASO 1 (con pago, todo OK):
+      // Copiar fila original EXACTAMENTE como está — sin tocar nada
       const filaOrig=S.informe[plan.filaIdx];
       data.push(cols.map(col=>{
-        const v=gc(filaOrig,col);
-        return(v===undefined||v===null||v==='')?'':v;
+        const key=colKeyMap[col];
+        if(key===null) return '';
+        const v=filaOrig[key];
+        return (v===undefined||v===null)?'':v;
       }));
+
+    }else if(plan.tipo==='caso2'){
+      // CASO 2: Copiar fila original pero SOLO cambiar PRÓXIMO PASO
+      // Todo lo demás (ETAPA, SUBETAPA, ACTIVIDAD, FECHA, etc.) intacto
+      const filaOrig=S.informe[plan.filaIdx];
+      data.push(cols.map(col=>{
+        const ck=nk(col);
+        if(ck==='PRÓXIMO_PASO') return 'VERIFICAR PAGO';
+        const key=colKeyMap[col];
+        if(key===null) return '';
+        const v=filaOrig[key];
+        return (v===undefined||v===null)?'':v;
+      }));
+
     }else{
+      // CASOS 3, 4, 5: Fila nueva o reemplazada completa
       data.push(cols.map(col=>{
         const v=plan.datos[col];
         return(v===undefined||v===null)?'':v;
@@ -830,18 +972,37 @@ function descargarInformeCorregido(){
     'Celular en ACTIVIDAD','ETAPA','SUBETAPA','PRÓXIMO PASO','ACTIVIDAD completa'];
   const detData=[detHdr];
 
-  S.planCorr.forEach((plan,i)=>{
+  // En el detalle solo mostramos los que SÍ tuvieron alguna acción
+  // (casos 1 al 5). Las filas sin pago no se listan — pueden ser miles
+  // y no hubo ninguna modificación en ellas.
+  let detNum=0;
+  S.planCorr.forEach((plan)=>{
+    if(plan.tipo==='original') return; // sin pago — no listar
+
+    detNum++;
     if(plan.tipo==='ok'){
-      detData.push([i+1,plan.idCob,plan.nombre,
-        'SIN CAMBIO — fila original conservada',
+      // CASO 1: sin cambio
+      detData.push([detNum,plan.idCob,plan.nombre,
+        plan.casoDesc||'SIN CAMBIO — gestión válida y completa',
         plan.fechaGestion,plan.fechaPago,plan.importe,
-        '—','—','—','—','—']);
+        '—','(sin cambio)','(sin cambio)','(sin cambio)','(sin cambio)']);
+
+    }else if(plan.tipo==='caso2'){
+      // CASO 2: solo PRÓXIMO PASO corregido
+      const filaOrig=S.informe[plan.filaIdx];
+      const etapaOrig=String(gc(filaOrig,'ETAPA','etapa')||'').trim();
+      const subOrig=String(gc(filaOrig,'SUBETAPA','subetapa')||'').trim();
+      const actOrig=String(gc(filaOrig,'ACTIVIDAD','actividad')||'').trim();
+      detData.push([detNum,plan.idCob,plan.nombre,
+        plan.casoDesc||'PRÓXIMO PASO corregido a VERIFICAR PAGO',
+        plan.fechaGestion,plan.fechaPago,plan.importe,
+        '—',etapaOrig,subOrig,'VERIFICAR PAGO ← corregido',actOrig]);
+
     }else{
+      // CASOS 3, 4, 5: fila nueva o reemplazada
       const act=(plan.celular?plan.celular+' ':'')+' SE HABLO CON EL/LA TITULAR PASARA A CANCELAR';
-      detData.push([i+1,plan.idCob,plan.nombre,
-        plan.motivo==='Sin gestión en informe'
-          ?'FILA CREADA — no existía en el informe'
-          :'FILA REEMPLAZADA — gestión era posterior al pago',
+      detData.push([detNum,plan.idCob,plan.nombre,
+        plan.casoDesc||plan.motivo||'FILA CORREGIDA',
         plan.fechaGestion,plan.fechaPago,plan.importe,
         plan.celular||'(sin celular)',
         '01. COMPROMISO DE PAGO','DIAS','VERIFICAR PAGO',act]);
