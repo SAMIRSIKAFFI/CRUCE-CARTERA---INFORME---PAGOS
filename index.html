@@ -306,16 +306,40 @@ function onDrop(e,tipo){
 // ═══════════════════════════════════════════════════════════════════
 //  LEER ARCHIVO
 // ═══════════════════════════════════════════════════════════════════
+//  LEER ARCHIVO — detecta automáticamente la hoja con más datos
+//  Resuelve archivos con múltiples hojas donde los datos no están
+//  en la primera pestaña (ej: pp3p.xlsx con hoja de resumen primero)
+// ═══════════════════════════════════════════════════════════════════
 function leerArchivo(file){
   return new Promise((res,rej)=>{
     const r=new FileReader();
     r.onload=e=>{
       try{
         const wb=XLSX.read(e.target.result,{type:'binary',cellDates:true});
-        const ws=wb.Sheets[wb.SheetNames[0]];
-        const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-        const headers=(XLSX.utils.sheet_to_json(ws,{header:1,defval:''})[0]||[]).map(h=>String(h));
-        res({rows,headers});
+
+        // Recorrer TODAS las hojas y elegir la que tenga más filas con datos
+        let mejorWs=null, mejorCant=-1, mejorNombre='';
+        for(const nombre of wb.SheetNames){
+          const ws=wb.Sheets[nombre];
+          const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+          // Contar filas que tengan al menos una celda no vacía
+          const cant=raw.filter(f=>f.some(c=>String(c).trim()!=='')).length;
+          if(cant>mejorCant){mejorCant=cant;mejorWs=ws;mejorNombre=nombre;}
+        }
+
+        if(!mejorWs||mejorCant<=1){
+          rej(new Error(
+            'El archivo "'+file.name+'" no tiene datos.\n'+
+            'Hojas encontradas: '+wb.SheetNames.join(', ')+'\n'+
+            'Verifica que el archivo no esté vacío o protegido.'
+          ));
+          return;
+        }
+
+        const rows=XLSX.utils.sheet_to_json(mejorWs,{defval:''});
+        const headers=(XLSX.utils.sheet_to_json(mejorWs,{header:1,defval:''})[0]||[]).map(h=>String(h));
+        console.log('['+file.name+'] Hoja seleccionada: "'+mejorNombre+'" ('+rows.length+' filas)');
+        res({rows,headers,hojaNombre:mejorNombre});
       }catch(err){rej(err);}
     };
     r.onerror=rej;
@@ -347,7 +371,8 @@ async function procesarCarteras(files){
       S.carteras.push({filename:file.name,rows});
       const tag=document.createElement('div');
       tag.className='file-tag';
-      tag.innerHTML=`<span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${rows.length} filas)</span>`;
+      const hojaInfo=hojaNombre&&hojaNombre!==file.name?` · hoja: ${hojaNombre}`:'';
+      tag.innerHTML=`<span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${rows.length} filas${hojaInfo})</span>`;
       tagsEl.appendChild(tag);
     }catch(err){
       const tag=document.createElement('div');tag.className='file-tag';
