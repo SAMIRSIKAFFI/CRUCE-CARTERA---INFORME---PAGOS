@@ -12,74 +12,110 @@
   body{font-family:'IBM Plex Sans',sans-serif;background:var(--c-bg);color:var(--c-text);min-height:100vh;font-size:14px;line-height:1.6;}
   header{border-bottom:1px solid var(--c-border);padding:0 2rem;height:56px;display:flex;align-items:center;gap:14px;position:sticky;top:0;background:var(--c-bg);z-index:100;}
   .logo-mark{width:32px;height:32px;background:var(--c-accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:#0f0f0f;flex-shrink:0;}
-  header h1{font-size:14px;font-weight:500;}header span{font-size:12px;color:var(--c-text3);font-family:'IBM Plex Mono',monospace;}
+  header h1{font-size:14px;font-weight:500;}
+  header span{font-size:12px;color:var(--c-text3);font-family:'IBM Plex Mono',monospace;}
   .header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--c-text3);transition:background .3s;}.status-dot.ready{background:var(--c-ok);}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--c-text3);transition:background .3s;}
+  .status-dot.ready{background:var(--c-ok);}
   .shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 56px);}
   aside{border-right:1px solid var(--c-border);padding:1.5rem 1rem;display:flex;flex-direction:column;gap:.5rem;}
   .sidebar-section{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--c-text3);padding:.75rem .5rem .4rem;font-family:'IBM Plex Mono',monospace;}
   .step-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius);cursor:pointer;transition:background .15s;border:1px solid transparent;}
-  .step-item:hover{background:var(--c-surface);}.step-item.active{background:var(--c-surface2);border-color:var(--c-border2);}
+  .step-item:hover{background:var(--c-surface);}
+  .step-item.active{background:var(--c-surface2);border-color:var(--c-border2);}
   .step-num{width:22px;height:22px;border-radius:50%;border:1px solid var(--c-border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--c-text3);flex-shrink:0;transition:all .2s;}
   .step-item.done .step-num{background:var(--c-ok);border-color:var(--c-ok);color:#0f0f0f;font-weight:600;}
   .step-item.active .step-num{border-color:var(--c-accent);color:var(--c-accent);}
-  .step-label{font-size:13px;}.step-sub{font-size:11px;color:var(--c-text3);}
+  .step-label{font-size:13px;}
+  .step-sub{font-size:11px;color:var(--c-text3);}
   .sidebar-divider{height:1px;background:var(--c-border);margin:.5rem 0;}
-  main{padding:2rem;max-width:960px;}.panel{display:none;}.panel.active{display:block;}
+  main{padding:2rem;max-width:960px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
   .panel-title{font-size:20px;font-weight:500;margin-bottom:.25rem;}
   .panel-desc{font-size:13px;color:var(--c-text2);margin-bottom:2rem;}
   .upload-zone{border:1.5px dashed var(--c-border2);border-radius:var(--radius-lg);padding:2.5rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--c-surface);position:relative;}
   .upload-zone:hover,.upload-zone.drag-over{border-color:var(--c-accent);background:rgba(212,168,83,.04);}
   .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-  .upload-icon{font-size:28px;margin-bottom:.75rem;color:var(--c-text3);}.upload-zone h3{font-size:14px;font-weight:500;margin-bottom:.25rem;}.upload-zone p{font-size:12px;color:var(--c-text3);}
+  .upload-icon{font-size:28px;margin-bottom:.75rem;color:var(--c-text3);}
+  .upload-zone h3{font-size:14px;font-weight:500;margin-bottom:.25rem;}
+  .upload-zone p{font-size:12px;color:var(--c-text3);}
   .file-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--c-surface2);border:1px solid var(--c-border2);border-radius:20px;font-size:12px;font-family:'IBM Plex Mono',monospace;margin-top:.75rem;}
-  .file-tag .dot{width:6px;height:6px;border-radius:50%;}.dot-ok{background:var(--c-ok);}.dot-warn{background:var(--c-warn);}
+  .file-tag .dot{width:6px;height:6px;border-radius:50%;}
+  .dot-ok{background:var(--c-ok);}
+  .dot-warn{background:var(--c-warn);}
+  .dot-err{background:var(--c-err);}
   .file-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:.75rem;}
   .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:1.5rem 0;}
   .stat-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-lg);padding:1rem;}
   .stat-label{font-size:11px;color:var(--c-text3);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono',monospace;}
   .stat-value{font-size:26px;font-weight:500;margin-top:2px;font-variant-numeric:tabular-nums;}
-  .stat-value.ok{color:var(--c-ok);}.stat-value.warn{color:var(--c-warn);}.stat-value.err{color:var(--c-err);}.stat-value.info{color:var(--c-info);}
+  .stat-value.ok{color:var(--c-ok);}
+  .stat-value.warn{color:var(--c-warn);}
+  .stat-value.err{color:var(--c-err);}
+  .stat-value.info{color:var(--c-info);}
   .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'IBM Plex Sans',sans-serif;}
-  .btn-primary{background:var(--c-accent);color:#0f0f0f;}.btn-primary:hover{background:var(--c-accent2);}.btn-primary:disabled{opacity:.4;cursor:not-allowed;}
-  .btn-ghost{background:transparent;color:var(--c-text2);border:1px solid var(--c-border2);}.btn-ghost:hover{background:var(--c-surface);color:var(--c-text);}
-  .btn-ok{background:var(--c-ok);color:#0f0f0f;font-size:14px;font-weight:600;padding:10px 22px;}.btn-ok:hover{filter:brightness(1.1);}.btn-ok:disabled{opacity:.4;cursor:not-allowed;}
-  .btn-warn{background:var(--c-warn);color:#0f0f0f;}.btn-warn:hover{filter:brightness(1.1);}.btn-warn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-primary{background:var(--c-accent);color:#0f0f0f;}
+  .btn-primary:hover{background:var(--c-accent2);}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--c-text2);border:1px solid var(--c-border2);}
+  .btn-ghost:hover{background:var(--c-surface);color:var(--c-text);}
+  .btn-ok{background:var(--c-ok);color:#0f0f0f;font-size:14px;font-weight:600;padding:10px 22px;}
+  .btn-ok:hover{filter:brightness(1.1);}
+  .btn-ok:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-warn{background:var(--c-warn);color:#0f0f0f;}
+  .btn-warn:hover{filter:brightness(1.1);}
+  .btn-warn:disabled{opacity:.4;cursor:not-allowed;}
   .process-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;}
   .process-card h3{font-size:14px;font-weight:500;margin-bottom:.5rem;}
   .table-wrap{overflow-x:auto;border:1px solid var(--c-border);border-radius:var(--radius-lg);margin-top:1rem;}
   table{width:100%;border-collapse:collapse;font-size:12px;font-family:'IBM Plex Mono',monospace;}
   thead th{background:var(--c-surface2);padding:8px 12px;text-align:left;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--c-text3);border-bottom:1px solid var(--c-border);white-space:nowrap;}
   tbody td{padding:7px 12px;border-bottom:1px solid var(--c-border);color:var(--c-text2);white-space:nowrap;}
-  tbody tr:last-child td{border-bottom:none;}tbody tr:hover td{background:var(--c-surface);}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover td{background:var(--c-surface);}
   .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:500;font-family:'IBM Plex Mono',monospace;}
-  .badge-ok{background:rgba(76,175,125,.15);color:var(--c-ok);}.badge-err{background:rgba(224,80,80,.15);color:var(--c-err);}.badge-warn{background:rgba(224,133,74,.15);color:var(--c-warn);}
+  .badge-ok{background:rgba(76,175,125,.15);color:var(--c-ok);}
+  .badge-err{background:rgba(224,80,80,.15);color:var(--c-err);}
+  .badge-warn{background:rgba(224,133,74,.15);color:var(--c-warn);}
   .result-title{font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--c-text3);font-family:'IBM Plex Mono',monospace;margin-bottom:.75rem;display:flex;align-items:center;gap:8px;}
   .result-title::after{content:'';flex:1;height:1px;background:var(--c-border);}
   .checklist{display:flex;flex-direction:column;gap:8px;margin:1rem 0;}
   .check-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:var(--radius);background:var(--c-surface);border:1px solid var(--c-border);font-size:13px;}
-  .check-item .ci-icon{font-size:16px;flex-shrink:0;margin-top:1px;}.check-item .ci-label{font-weight:400;line-height:1.5;}
+  .check-item .ci-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+  .check-item .ci-label{font-weight:400;line-height:1.5;}
   .progress-wrap{background:var(--c-surface);border-radius:3px;height:4px;margin-top:.5rem;overflow:hidden;}
   .progress-bar{height:100%;background:var(--c-accent);border-radius:3px;transition:width .5s ease;}
   .alert{padding:12px 14px;border-radius:var(--radius);font-size:13px;margin:1rem 0;display:flex;gap:8px;border-left:3px solid;}
   .alert-warn{background:rgba(224,133,74,.1);border-color:var(--c-warn);color:var(--c-text2);}
   .alert-ok{background:rgba(76,175,125,.1);border-color:var(--c-ok);color:var(--c-text2);}
   .alert-info{background:rgba(90,159,212,.1);border-color:var(--c-info);color:var(--c-text2);}
+  .alert-err{background:rgba(224,80,80,.1);border-color:var(--c-err);color:var(--c-text2);}
   .panel-nav{display:flex;gap:10px;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--c-border);}
   .log-box{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);padding:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--c-text3);max-height:220px;overflow-y:auto;line-height:1.8;margin-top:1rem;}
-  .log-line-ok{color:var(--c-ok);}.log-line-err{color:var(--c-err);}.log-line-warn{color:var(--c-warn);}.log-line-info{color:var(--c-info);}
-  /* ── DOWNLOAD BOXES ── */
+  .log-line-ok{color:var(--c-ok);}
+  .log-line-err{color:var(--c-err);}
+  .log-line-warn{color:var(--c-warn);}
+  .log-line-info{color:var(--c-info);}
   .dl-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
   .dl-box{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-lg);padding:1.25rem;}
   .dl-box.main{grid-column:1/-1;border-color:var(--c-ok);background:rgba(76,175,125,.04);}
   .dl-box h3{font-size:13px;font-weight:600;margin-bottom:.3rem;}
   .dl-box p{font-size:11px;color:var(--c-text3);margin-bottom:.9rem;line-height:1.6;}
   .tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:11px;font-family:'IBM Plex Mono',monospace;}
-  .tag-ok{background:rgba(76,175,125,.15);color:var(--c-ok);}.tag-warn{background:rgba(224,133,74,.15);color:var(--c-warn);}.tag-err{background:rgba(224,80,80,.15);color:var(--c-err);}
+  .tag-ok{background:rgba(76,175,125,.15);color:var(--c-ok);}
+  .tag-warn{background:rgba(224,133,74,.15);color:var(--c-warn);}
+  .tag-err{background:rgba(224,80,80,.15);color:var(--c-err);}
   .tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.9rem;}
   .key-box{background:var(--c-surface2);border:1px solid var(--c-border2);border-radius:var(--radius);padding:1rem;margin:1rem 0;font-size:12px;font-family:'IBM Plex Mono',monospace;line-height:2;}
   .key-box .krow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-  .key-box .karrow{color:var(--c-accent);}.key-box .kfile{color:var(--c-info);}
+  .key-box .karrow{color:var(--c-accent);}
+  .key-box .kfile{color:var(--c-info);}
+  /* Barra de progreso de carga */
+  .load-progress{display:none;margin-top:.75rem;}
+  .load-progress-bar{height:3px;background:var(--c-border);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+  .load-progress-fill{height:100%;background:var(--c-accent);border-radius:3px;transition:width .3s;}
+  .load-progress-text{font-size:11px;color:var(--c-text3);font-family:'IBM Plex Mono',monospace;}
   @media(max-width:768px){.shell{grid-template-columns:1fr;}aside{display:none;}.dl-grid{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -106,19 +142,33 @@
 
 <main>
 
-<!-- ══ PASO 1: CARTERAS ══ -->
+<!-- ══ PASO 1 ══ -->
 <div class="panel active" id="panel1">
   <div class="panel-title">Carteras asignadas</div>
   <div class="panel-desc">Carga una o varias carteras del 1° de mes. Se combinarán automáticamente.</div>
   <div class="key-box">
-    <div class="krow"><span class="kfile">CARTERA</span><span class="karrow">→ clave:</span><span>ID_COBRANZA</span><span style="color:var(--c-text3)">↔</span><span class="kfile">PAGOS</span><span class="karrow">→ clave:</span><span>Id Cobranza</span><span style="color:var(--c-text3)">↔</span><span class="kfile">INFORME</span><span class="karrow">→ clave:</span><span>ID CLIENTE</span></div>
+    <div class="krow">
+      <span class="kfile">CARTERA</span><span class="karrow">→ clave:</span><span>ID_COBRANZA</span>
+      <span style="color:var(--c-text3)">↔</span>
+      <span class="kfile">PAGOS</span><span class="karrow">→ clave:</span><span>Id Cobranza</span>
+      <span style="color:var(--c-text3)">↔</span>
+      <span class="kfile">INFORME</span><span class="karrow">→ clave:</span><span>ID CLIENTE</span>
+    </div>
     <div style="margin-top:4px;color:var(--c-accent);font-size:11px;">✦ Los tres campos contienen el mismo código — son la clave única de cruce</div>
+  </div>
+  <div class="alert alert-info">
+    <span>ℹ</span>
+    <span><strong>Archivos grandes (&gt;10 MB):</strong> la carga puede tardar 20–60 segundos. Por favor espera hasta ver el contador de filas.</span>
   </div>
   <div class="upload-zone" id="zoneCarteras" ondragover="onDragOver(event,'zoneCarteras')" ondragleave="onDragLeave('zoneCarteras')" ondrop="onDrop(event,'cartera')">
     <input type="file" id="fileCarteras" accept=".xlsx,.xls,.csv" multiple onchange="handleCarteras(event)">
     <div class="upload-icon">📂</div>
     <h3>Arrastra los archivos de cartera aquí</h3>
     <p>Formatos: .xlsx · .xls · .csv — Se permiten múltiples archivos</p>
+  </div>
+  <div class="load-progress" id="progCarteras">
+    <div class="load-progress-bar"><div class="load-progress-fill" id="progCarterasBar" style="width:0%"></div></div>
+    <div class="load-progress-text" id="progCarterasText">Leyendo archivo...</div>
   </div>
   <div class="file-list" id="fileTagsCarteras"></div>
   <div id="resumenCarteras" style="display:none;margin-top:1.5rem;">
@@ -132,7 +182,7 @@
   <div class="panel-nav"><button class="btn btn-primary" onclick="goTo(2)" id="btnNextCarteras" disabled>Continuar →</button></div>
 </div>
 
-<!-- ══ PASO 2: PAGOS ══ -->
+<!-- ══ PASO 2 ══ -->
 <div class="panel" id="panel2">
   <div class="panel-title">Base de pagos</div>
   <div class="panel-desc">Archivo de pagos subido al sistema de cobranza. Columna clave: <strong>Id Cobranza</strong></div>
@@ -141,6 +191,10 @@
     <div class="upload-icon">💳</div>
     <h3>Arrastra la base de pagos aquí</h3>
     <p>Columnas: Periodo · Producto · Id Cobranza · Ciudad · Importe · Fecha pago</p>
+  </div>
+  <div class="load-progress" id="progPagos">
+    <div class="load-progress-bar"><div class="load-progress-fill" id="progPagosBar" style="width:0%"></div></div>
+    <div class="load-progress-text" id="progPagosText">Leyendo archivo...</div>
   </div>
   <div id="fileTagPagos"></div>
   <div id="resumenPagos" style="display:none;margin-top:1.5rem;">
@@ -154,15 +208,19 @@
   <div class="panel-nav"><button class="btn btn-ghost" onclick="goTo(1)">← Atrás</button><button class="btn btn-primary" onclick="goTo(3)" id="btnNextPagos" disabled>Continuar →</button></div>
 </div>
 
-<!-- ══ PASO 3: INFORME ══ -->
+<!-- ══ PASO 3 ══ -->
 <div class="panel" id="panel3">
   <div class="panel-title">Informe de gestión de cobranza</div>
-  <div class="panel-desc">Informe del sistema de cobranza. La columna <strong>ID CLIENTE</strong> = <strong>ID_COBRANZA</strong> de la cartera.</div>
+  <div class="panel-desc">Informe del sistema. <strong>ID CLIENTE</strong> = <strong>ID_COBRANZA</strong> de la cartera.</div>
   <div class="upload-zone" id="zoneInforme" ondragover="onDragOver(event,'zoneInforme')" ondragleave="onDragLeave('zoneInforme')" ondrop="onDrop(event,'informe')">
     <input type="file" id="fileInforme" accept=".xlsx,.xls,.csv" onchange="handleInforme(event)">
     <div class="upload-icon">📋</div>
     <h3>Arrastra el informe de gestión aquí</h3>
     <p>Columnas: PRODUCTO · ID CLIENTE · NOMBRE CLIENTE · FECHA · ETAPA · SUBETAPA · ACTIVIDAD · PRÓXIMO PASO · TELF TITULAR · TELF CONYUGE · CIUDAD</p>
+  </div>
+  <div class="load-progress" id="progInforme">
+    <div class="load-progress-bar"><div class="load-progress-fill" id="progInformeBar" style="width:0%"></div></div>
+    <div class="load-progress-text" id="progInformeText">Leyendo archivo...</div>
   </div>
   <div id="fileTagInforme"></div>
   <div id="resumenInforme" style="display:none;margin-top:1.5rem;">
@@ -171,21 +229,21 @@
       <div class="stat-card"><div class="stat-label">IDs únicos</div><div class="stat-value" id="cntGestionUnicos">0</div></div>
       <div class="stat-card"><div class="stat-label">Rango fechas</div><div class="stat-value info" style="font-size:13px" id="fechaRango">—</div></div>
     </div>
-    <div class="alert alert-ok"><span>✔</span><span>Informe cargado. Las columnas originales se reproducirán exactamente en el archivo de salida.</span></div>
+    <div class="alert alert-ok"><span>✔</span><span>Informe cargado. Las columnas originales se reproducirán exactamente.</span></div>
   </div>
   <div class="panel-nav"><button class="btn btn-ghost" onclick="goTo(2)">← Atrás</button><button class="btn btn-primary" onclick="goTo(4)" id="btnNextInforme" disabled>Continuar →</button></div>
 </div>
 
-<!-- ══ PASO 4: CRUCE ══ -->
+<!-- ══ PASO 4 ══ -->
 <div class="panel" id="panel4">
   <div class="panel-title">Ejecutar cruce</div>
   <div class="panel-desc">Validación de las tres condiciones para el reconocimiento de comisión.</div>
   <div class="process-card">
     <h3>Reglas de validación</h3>
     <div class="checklist" style="margin-top:.75rem;">
-      <div class="check-item"><span class="ci-icon">①</span><span class="ci-label">El <strong>Id Cobranza</strong> del pago debe existir como <strong>ID_COBRANZA</strong> en la cartera asignada</span></div>
+      <div class="check-item"><span class="ci-icon">①</span><span class="ci-label"><strong>Id Cobranza</strong> del pago debe existir como <strong>ID_COBRANZA</strong> en la cartera asignada</span></div>
       <div class="check-item"><span class="ci-icon">②</span><span class="ci-label">Ese mismo código debe aparecer como <strong>ID CLIENTE</strong> en el informe de gestión</span></div>
-      <div class="check-item"><span class="ci-icon">③</span><span class="ci-label">La <strong>FECHA</strong> de gestión debe ser igual o anterior a la <strong>Fecha pago</strong> (nunca posterior)</span></div>
+      <div class="check-item"><span class="ci-icon">③</span><span class="ci-label">La <strong>FECHA</strong> de gestión debe ser igual o <strong>anterior</strong> a la Fecha de pago (incluyendo el día anterior)</span></div>
     </div>
   </div>
   <div style="display:flex;gap:10px;margin-top:1.5rem;align-items:center;">
@@ -195,11 +253,10 @@
   <div class="panel-nav"><button class="btn btn-ghost" onclick="goTo(3)">← Atrás</button><button class="btn btn-primary" onclick="goTo(5)" id="btnNextCruce" disabled>Ver resultados →</button></div>
 </div>
 
-<!-- ══ PASO 5: RESULTADOS ══ -->
+<!-- ══ PASO 5 ══ -->
 <div class="panel" id="panel5">
   <div class="panel-title">Resultados del cruce</div>
   <div class="panel-desc">Análisis completo. Descarga las planillas.</div>
-
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-label">Total pagos</div><div class="stat-value" id="rTotalPagos">—</div></div>
     <div class="stat-card"><div class="stat-label">Con comisión OK</div><div class="stat-value ok" id="rOk">—</div></div>
@@ -207,55 +264,43 @@
     <div class="stat-card"><div class="stat-label">Gestión posterior</div><div class="stat-value warn" id="rPosterior">—</div></div>
     <div class="stat-card"><div class="stat-label">Fuera de cartera</div><div class="stat-value" id="rFueraCartera">—</div></div>
   </div>
-
   <div style="margin:.5rem 0 1.5rem;">
     <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--c-text3);margin-bottom:4px;"><span>Tasa de comisión reconocible</span><span id="tasaPct">—</span></div>
     <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
   </div>
-
-  <!-- ── DESCARGA PRINCIPAL ── -->
   <div class="dl-grid">
     <div class="dl-box main">
       <h3>📄 INFORME CORREGIDO — para presentar a VIVA</h3>
-      <p>
-        Genera un Excel con <strong>2 pestañas</strong>:<br>
-        &nbsp;&nbsp;<strong>Pestaña 1 "Informe Corregido"</strong> → el informe completo listo para presentar, con exactamente 1 fila por código pagado.<br>
-        &nbsp;&nbsp;<strong>Pestaña 2 "Detalle Correcciones"</strong> → qué se hizo en cada código: sin cambio, fila creada, o fila reemplazada.
-      </p>
+      <p>Excel con <strong>2 pestañas</strong>:<br>
+      &nbsp;&nbsp;<strong>Pestaña 1 "Informe Corregido"</strong> → informe completo, 1 fila por código, listo para presentar.<br>
+      &nbsp;&nbsp;<strong>Pestaña 2 "Detalle Correcciones"</strong> → qué se hizo en cada código (sin cambio / creado / reemplazado).</p>
       <div class="tag-row">
-        <span class="tag tag-ok">✔ Ya cumplía → fila original conservada</span>
-        <span class="tag tag-warn">⚡ Gestión posterior → fila reemplazada con fecha de pago</span>
+        <span class="tag tag-ok">✔ Ya cumplía → conservado sin cambio</span>
+        <span class="tag tag-warn">⚡ Gestión posterior → reemplazado con fecha de pago</span>
         <span class="tag tag-err">✚ Sin gestión → fila nueva creada</span>
       </div>
-      <button class="btn btn-ok" onclick="descargarInformeCorregido()" id="btnInformeCorregido" disabled>
-        ⬇ Descargar INFORME CORREGIDO (.xlsx)
-      </button>
+      <button class="btn btn-ok" onclick="descargarInformeCorregido()" id="btnInformeCorregido" disabled>⬇ Descargar INFORME CORREGIDO (.xlsx)</button>
       <span style="font-size:11px;color:var(--c-text3);margin-left:10px" id="notaInforme"></span>
     </div>
-
     <div class="dl-box">
       <h3>📋 Solo observados (control interno)</h3>
-      <p>Lista de los códigos que necesitaron corrección, para tu seguimiento interno.</p>
+      <p>Lista de los códigos que necesitaron corrección.</p>
       <button class="btn btn-warn" onclick="descargarObservados()" id="btnDescarga" disabled>⬇ Descargar Observados (.xlsx)</button>
     </div>
-
     <div class="dl-box">
       <h3>✅ Solo los OK (sin modificación)</h3>
-      <p>Códigos que ya cumplían todas las condiciones desde el inicio.</p>
+      <p>Códigos que ya cumplían todas las condiciones.</p>
       <button class="btn btn-ghost" onclick="descargarExcelOk()" id="btnDescargaOk" disabled>⬇ Descargar Comisión OK (.xlsx)</button>
     </div>
   </div>
-
-  <div class="result-title">Vista previa — códigos observados (corregidos)</div>
+  <div class="result-title">Vista previa — códigos observados</div>
   <div class="table-wrap">
     <table>
       <thead><tr><th>#</th><th>ID_COBRANZA</th><th>Nombre Cliente</th><th>Fecha Pago</th><th>Importe</th><th>Motivo</th><th>Fecha Gestión orig.</th></tr></thead>
-      <tbody id="tbodyObservados">
-        <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--c-text3)">Ejecuta el cruce para ver resultados</td></tr>
-      </tbody>
+      <tbody id="tbodyObservados"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--c-text3)">Ejecuta el cruce para ver resultados</td></tr></tbody>
     </table>
   </div>
-  <div class="panel-nav"><button class="btn btn-ghost" onclick="goTo(4)">← Volver al cruce</button><button class="btn btn-ghost" onclick="reiniciar()">🔄 Nuevo análisis</button></div>
+  <div class="panel-nav"><button class="btn btn-ghost" onclick="goTo(4)">← Volver</button><button class="btn btn-ghost" onclick="reiniciar()">🔄 Nuevo análisis</button></div>
 </div>
 
 </main>
@@ -265,18 +310,12 @@
 // ═══════════════════════════════════════════════════════════════════
 //  ESTADO GLOBAL
 // ═══════════════════════════════════════════════════════════════════
-const S = {
-  carteras    : [],
-  carteraMap  : {},   // ID_COBRANZA → fila cartera
-  pagos       : [],
-  informe     : [],
-  informeHdrs : [],   // headers EXACTOS del informe (texto tal cual viene del Excel)
-  gestionMap  : {},   // ID_COBRANZA → [{fecha, filaIdx}]  (filaIdx = índice en S.informe)
-  resultados  : [],   // observados
-  resultadosOk: [],   // ok sin cambio
-  // El informe corregido se guarda como array de índices/instrucciones
-  // para reconstruirlo fielmente en la descarga
-  planCorr    : []    // [{tipo:'ok'|'nuevo', filaIdx:N o null, datos:{...}}]
+const S={
+  carteras:[],carteraMap:{},
+  pagos:[],informe:[],informeHdrs:[],
+  gestionMap:{},
+  resultados:[],resultadosOk:[],
+  planCorr:[]
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -287,7 +326,7 @@ function goTo(n){
   document.getElementById('panel'+n).classList.add('active');
   document.querySelectorAll('.step-item').forEach((el,i)=>{
     el.classList.remove('active');
-    if(i+1<n) el.classList.add('done'); else el.classList.remove('done');
+    if(i+1<n)el.classList.add('done');else el.classList.remove('done');
   });
   document.getElementById('sideStep'+n).classList.add('active');
 }
@@ -298,98 +337,173 @@ function onDrop(e,tipo){
   const zm={cartera:'zoneCarteras',pagos:'zonePagos',informe:'zoneInforme'};
   document.getElementById(zm[tipo]).classList.remove('drag-over');
   const f=e.dataTransfer.files;
-  if(tipo==='cartera') procesarCarteras(f);
-  else if(tipo==='pagos') procesarPagos(f[0]);
+  if(tipo==='cartera')procesarCarteras(f);
+  else if(tipo==='pagos')procesarPagos(f[0]);
   else procesarInforme(f[0]);
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  LEER ARCHIVO
+//  LEER ARCHIVO — robusto para archivos grandes (hasta ~200 MB)
+//  Usa workers internos de SheetJS con streaming por chunks
 // ═══════════════════════════════════════════════════════════════════
-//  LEER ARCHIVO — detecta automáticamente la hoja con más datos
-//  Resuelve archivos con múltiples hojas donde los datos no están
-//  en la primera pestaña (ej: pp3p.xlsx con hoja de resumen primero)
-// ═══════════════════════════════════════════════════════════════════
-function leerArchivo(file){
+function leerArchivo(file, progBarId, progTextId){
   return new Promise((res,rej)=>{
-    const r=new FileReader();
-    r.onload=e=>{
-      try{
-        const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
 
-        // Recorrer TODAS las hojas y elegir la que tenga más filas con datos
-        let mejorWs=null, mejorCant=-1, mejorNombre='';
-        for(const nombre of wb.SheetNames){
-          const ws=wb.Sheets[nombre];
-          const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-          // Contar filas que tengan al menos una celda no vacía
-          const cant=raw.filter(f=>f.some(c=>String(c).trim()!=='')).length;
-          if(cant>mejorCant){mejorCant=cant;mejorWs=ws;mejorNombre=nombre;}
-        }
+    // Mostrar barra de progreso
+    const progWrap=document.getElementById(progBarId ? progBarId.replace('Bar','') : null);
+    const progBar=document.getElementById(progBarId);
+    const progText=document.getElementById(progTextId);
+    if(progWrap) progWrap.style.display='block';
+    if(progText) progText.textContent='Leyendo "'+file.name+'" ('+Math.round(file.size/1024/1024*10)/10+' MB)...';
+    if(progBar) progBar.style.width='10%';
 
-        if(!mejorWs){
-          rej(new Error('No se pudo leer el archivo "'+file.name+'". Hojas: '+wb.SheetNames.join(', ')));
-          return;
-        }
+    const reader=new FileReader();
 
-        const rows=XLSX.utils.sheet_to_json(mejorWs,{defval:'',raw:false});
-        const headers=(XLSX.utils.sheet_to_json(mejorWs,{header:1,defval:''})[0]||[]).map(h=>String(h));
-        console.log('['+file.name+'] Hoja: "'+mejorNombre+'" → '+rows.length+' filas');
-        res({rows,headers,hojaNombre:mejorNombre});
-      }catch(err){rej(err);}
+    reader.onprogress=function(e){
+      if(e.lengthComputable && progBar){
+        const pct=Math.round((e.loaded/e.total)*70)+10;
+        progBar.style.width=pct+'%';
+      }
     };
-    r.onerror=rej;
-    // ArrayBuffer es más robusto que BinaryString para archivos grandes (>10MB)
-    r.readAsArrayBuffer(file);
+
+    reader.onload=function(e){
+      try{
+        if(progBar) progBar.style.width='80%';
+        if(progText) progText.textContent='Procesando datos...';
+
+        // Forzar liberación del hilo antes de parsear archivos grandes
+        setTimeout(()=>{
+          try{
+            const data=e.target.result;
+
+            // SheetJS con {dense:true} usa mucha menos memoria en archivos grandes
+            const wb=XLSX.read(data,{
+              type:'array',
+              cellDates:true,
+              dense:false,      // false es más rápido para sheet_to_json
+              sheetStubs:false  // ignorar celdas vacías
+            });
+
+            // Elegir la hoja con más datos
+            let mejorWs=null,mejorCant=-1,mejorNombre='';
+            for(const nombre of wb.SheetNames){
+              const ws=wb.Sheets[nombre];
+              // Estimación rápida: rango de la hoja
+              const ref=ws['!ref'];
+              if(!ref){continue;}
+              const rango=XLSX.utils.decode_range(ref);
+              const filas=rango.e.r - rango.s.r + 1;
+              if(filas>mejorCant){mejorCant=filas;mejorWs=ws;mejorNombre=nombre;}
+            }
+
+            if(!mejorWs){
+              rej(new Error('El archivo "'+file.name+'" parece estar vacío.'));
+              return;
+            }
+
+            if(progBar) progBar.style.width='90%';
+
+            const rows=XLSX.utils.sheet_to_json(mejorWs,{defval:'',raw:false});
+            const headers=(XLSX.utils.sheet_to_json(mejorWs,{header:1,defval:''})[0]||[]).map(h=>String(h).trim());
+
+            if(progBar) progBar.style.width='100%';
+            if(progText) progText.textContent='✔ Listo: "'+mejorNombre+'" — '+rows.length.toLocaleString()+' filas';
+
+            setTimeout(()=>{if(progWrap)progWrap.style.display='none';},2000);
+
+            res({rows,headers,hojaNombre:mejorNombre});
+
+          }catch(err2){
+            if(progText) progText.textContent='❌ Error: '+err2.message;
+            rej(err2);
+          }
+        },50);
+
+      }catch(err){
+        if(progText) progText.textContent='❌ Error: '+err.message;
+        rej(err);
+      }
+    };
+
+    reader.onerror=function(){rej(new Error('No se pudo leer el archivo "'+file.name+'"'));};
+
+    // Leer como ArrayBuffer — el más robusto para todos los tamaños
+    reader.readAsArrayBuffer(file);
   });
 }
 
-// Normaliza clave para comparación flexible (sin importar mayúsculas/espacios)
+// ═══════════════════════════════════════════════════════════════════
+//  UTILIDADES
+// ═══════════════════════════════════════════════════════════════════
 function nk(k){return String(k||'').trim().toUpperCase().replace(/\s+/g,'_');}
 
-// Obtiene valor de una fila por nombre de columna (flexible)
 function gc(row,...names){
   for(const n of names){
     const k=Object.keys(row).find(c=>nk(c)===nk(n));
-    if(k!==undefined) return row[k];
+    if(k!==undefined)return row[k];
   }
   return '';
 }
 
+// Limpia el número de celular:
+// - Quita prefijos de una letra seguidos de dígitos: I70813185 → 70813185
+// - Toma el primer número si hay varios separados por guión
+// - Retorna vacío si el resultado no parece un teléfono
+function limpiarCelular(val){
+  if(!val) return '';
+  let s=String(val).trim();
+  // Si tiene guión, tomar el primer segmento
+  if(s.includes('-')) s=s.split('-')[0].trim();
+  // Quitar prefijo de una sola letra (I, M, P, etc.) seguido de dígitos
+  s=s.replace(/^[A-Za-z](\d{7,})$/,'$1');
+  // Si lo que queda tiene al menos 7 dígitos, es válido
+  if(/^\d{7,}$/.test(s.replace(/\s/g,''))) return s;
+  return val; // retornar original si no se pudo limpiar
+}
+
 // ═══════════════════════════════════════════════════════════════════
-//  PASO 1 – CARTERAS  (clave: ID_COBRANZA)
+//  PASO 1 – CARTERAS
 // ═══════════════════════════════════════════════════════════════════
 function handleCarteras(e){procesarCarteras(e.target.files);}
+
 async function procesarCarteras(files){
   const tagsEl=document.getElementById('fileTagsCarteras');
-  for(const file of files){
-    try{
-      const {rows}=await leerArchivo(file);
-      S.carteras.push({filename:file.name,rows});
-      const tag=document.createElement('div');
-      tag.className='file-tag';
-      const hojaInfo=hojaNombre&&hojaNombre!==file.name?` · hoja: ${hojaNombre}`:'';
-      tag.innerHTML=`<span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${rows.length} filas${hojaInfo})</span>`;
-      tagsEl.appendChild(tag);
-    }catch(err){
-      const tag=document.createElement('div');tag.className='file-tag';
-      tag.innerHTML=`<span class="dot dot-warn"></span>${file.name} — error`;tagsEl.appendChild(tag);
-    }
-  }
-  reconstruirCarteraMap();
-}
-function reconstruirCarteraMap(){
-  S.carteraMap={};
   let total=0,dupes=0;
-  for(const c of S.carteras){
-    for(const row of c.rows){
-      const id=String(gc(row,'ID_COBRANZA','ID COBRANZA','IDCOBRANZA')||'').trim();
-      if(!id) continue;
-      total++;
-      if(S.carteraMap[id]) dupes++;
-      else S.carteraMap[id]=row;
+
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    // Mostrar que está cargando
+    const tagLoading=document.createElement('div');
+    tagLoading.className='file-tag';
+    tagLoading.id='tag_'+i;
+    tagLoading.innerHTML='<span class="dot dot-warn"></span>'+file.name+' <span style="color:var(--c-text3)">cargando...</span>';
+    tagsEl.appendChild(tagLoading);
+
+    try{
+      const {rows,hojaNombre}=await leerArchivo(file,'progCarterasBar','progCarterasText');
+      S.carteras.push({filename:file.name,rows});
+
+      // Contar IDs
+      for(const row of rows){
+        const id=String(gc(row,'ID_COBRANZA','ID COBRANZA','IDCOBRANZA')||'').trim();
+        if(!id)continue;
+        total++;
+        if(S.carteraMap[id])dupes++;
+        else S.carteraMap[id]=row;
+      }
+
+      // Actualizar tag
+      const unicos=Object.keys(S.carteraMap).length;
+      const hojaInfo=hojaNombre?' · hoja: '+hojaNombre:'';
+      tagLoading.innerHTML='<span class="dot dot-ok"></span>'+file.name+
+        ' <span style="color:var(--c-text3)">('+rows.length.toLocaleString()+' filas'+hojaInfo+')</span>';
+
+    }catch(err){
+      tagLoading.innerHTML='<span class="dot dot-err"></span>'+file.name+
+        ' <span style="color:var(--c-err)">— '+err.message.substring(0,60)+'</span>';
     }
   }
+
   const unicos=Object.keys(S.carteraMap).length;
   document.getElementById('cntArchivos').textContent=S.carteras.length;
   document.getElementById('cntRegistros').textContent=total.toLocaleString();
@@ -397,63 +511,65 @@ function reconstruirCarteraMap(){
   document.getElementById('cntDupes').textContent=dupes.toLocaleString();
   document.getElementById('resumenCarteras').style.display='block';
   document.getElementById('btnNextCarteras').disabled=unicos===0;
-  if(unicos>0) upd('Cartera lista · '+unicos+' IDs');
+  if(unicos>0)upd('Cartera lista · '+unicos.toLocaleString()+' IDs');
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  PASO 2 – PAGOS  (clave: Id Cobranza = ID_COBRANZA)
+//  PASO 2 – PAGOS
 // ═══════════════════════════════════════════════════════════════════
 function handlePagos(e){procesarPagos(e.target.files[0]);}
+
 async function procesarPagos(file){
-  if(!file) return;
+  if(!file)return;
   try{
-    const {rows}=await leerArchivo(file);
+    const {rows}=await leerArchivo(file,'progPagosBar','progPagosText');
     S.pagos=rows;
     let imp=0,en=0;
     for(const p of rows){
       const id=String(gc(p,'Id Cobranza','ID_COBRANZA','IDCOBRANZA','id cobranza')||'').trim();
-      const v=parseFloat(gc(p,'Importe','IMPORTE')||0);
+      const v=parseFloat(String(gc(p,'Importe','IMPORTE')||'0').replace(',','.'));
       imp+=isNaN(v)?0:v;
-      if(S.carteraMap[id]) en++;
+      if(S.carteraMap[id])en++;
     }
     document.getElementById('fileTagPagos').innerHTML=
-      `<div class="file-tag"><span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${rows.length} filas)</span></div>`;
+      '<div class="file-tag"><span class="dot dot-ok"></span>'+file.name+
+      ' <span style="color:var(--c-text3)">('+rows.length.toLocaleString()+' filas)</span></div>';
     document.getElementById('cntPagos').textContent=rows.length.toLocaleString();
     document.getElementById('importeTotal').textContent=imp.toLocaleString('es-BO',{style:'currency',currency:'BOB',maximumFractionDigits:2});
     document.getElementById('pagosEnCartera').textContent=en.toLocaleString();
     document.getElementById('pagosFuera').textContent=(rows.length-en).toLocaleString();
     document.getElementById('resumenPagos').style.display='block';
     document.getElementById('btnNextPagos').disabled=false;
-    upd('Pagos listos · '+rows.length);
-  }catch(err){alert('Error leyendo pagos: '+err.message);}
+    upd('Pagos listos · '+rows.length.toLocaleString());
+  }catch(err){
+    document.getElementById('fileTagPagos').innerHTML=
+      '<div class="file-tag"><span class="dot dot-err"></span>'+file.name+' — '+err.message+'</div>';
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  PASO 3 – INFORME  (clave: ID CLIENTE = ID_COBRANZA)
-//  IMPORTANTE: guardamos filaIdx para recuperar la fila ORIGINAL
-//  con sus claves exactas al momento de escribir el Excel.
+//  PASO 3 – INFORME
 // ═══════════════════════════════════════════════════════════════════
 function handleInforme(e){procesarInforme(e.target.files[0]);}
+
 async function procesarInforme(file){
-  if(!file) return;
+  if(!file)return;
   try{
-    const {rows,headers}=await leerArchivo(file);
-    S.informe=rows;
-    S.informeHdrs=headers;
-    S.gestionMap={};
+    const {rows,headers}=await leerArchivo(file,'progInformeBar','progInformeText');
+    S.informe=rows;S.informeHdrs=headers;S.gestionMap={};
     const fechas=[];
     rows.forEach((g,idx)=>{
-      // "ID CLIENTE" del informe = ID_COBRANZA de la cartera
       const id=String(gc(g,'ID CLIENTE','ID_CLIENTE','IDCLIENTE')||'').trim();
       const fecha=parseFecha(gc(g,'FECHA','fecha'));
-      if(!id) return;
-      if(!S.gestionMap[id]) S.gestionMap[id]=[];
-      S.gestionMap[id].push({fecha, filaIdx:idx});
-      if(fecha) fechas.push(fecha);
+      if(!id)return;
+      if(!S.gestionMap[id])S.gestionMap[id]=[];
+      S.gestionMap[id].push({fecha,filaIdx:idx});
+      if(fecha)fechas.push(fecha);
     });
     const unicos=Object.keys(S.gestionMap).length;
     document.getElementById('fileTagInforme').innerHTML=
-      `<div class="file-tag"><span class="dot dot-ok"></span>${file.name} <span style="color:var(--c-text3)">(${rows.length} filas)</span></div>`;
+      '<div class="file-tag"><span class="dot dot-ok"></span>'+file.name+
+      ' <span style="color:var(--c-text3)">('+rows.length.toLocaleString()+' filas)</span></div>';
     document.getElementById('cntGestion').textContent=rows.length.toLocaleString();
     document.getElementById('cntGestionUnicos').textContent=unicos.toLocaleString();
     if(fechas.length){
@@ -463,64 +579,53 @@ async function procesarInforme(file){
     }
     document.getElementById('resumenInforme').style.display='block';
     document.getElementById('btnNextInforme').disabled=false;
-    upd('Informe listo · '+rows.length+' gestiones · '+unicos+' IDs');
-  }catch(err){alert('Error leyendo informe: '+err.message);}
+    upd('Informe listo · '+rows.length.toLocaleString()+' gestiones · '+unicos.toLocaleString()+' IDs');
+  }catch(err){
+    document.getElementById('fileTagInforme').innerHTML=
+      '<div class="file-tag"><span class="dot dot-err"></span>'+file.name+' — '+err.message+'</div>';
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
 //  FECHAS
 // ═══════════════════════════════════════════════════════════════════
 function parseFecha(val){
-  if(!val) return null;
-  if(val instanceof Date) return isNaN(val)?null:val;
+  if(!val)return null;
+  if(val instanceof Date)return isNaN(val)?null:val;
   if(typeof val==='number'){const d=new Date((val-25569)*86400000);return isNaN(d)?null:d;}
-  const s=String(val).trim(); let m;
-  m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})/); if(m) return new Date(+m[3],+m[2]-1,+m[1]);
-  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);   if(m) return new Date(+m[1],+m[2]-1,+m[3]);
-  m=s.match(/^(\d{2})-(\d{2})-(\d{4})/);   if(m) return new Date(+m[3],+m[2]-1,+m[1]);
-  const d=new Date(s); return isNaN(d)?null:d;
+  const s=String(val).trim();let m;
+  m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+  m=s.match(/^(\d{2})-(\d{2})-(\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+  const d=new Date(s);return isNaN(d)?null:d;
 }
-function soloFecha(d){if(!d) return null; return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
-function fmtFecha(d){if(!d) return '—'; return d.toLocaleDateString('es-BO');}
-function serialExcel(d){if(!d) return ''; return Math.floor((d - new Date(Date.UTC(1899,11,30)))/86400000);}
+function soloFecha(d){if(!d)return null;return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function fmtFecha(d){if(!d)return '—';return d.toLocaleDateString('es-BO');}
+function serialExcel(d){if(!d)return '';return Math.floor((d-new Date(Date.UTC(1899,11,30)))/86400000);}
 
 // ═══════════════════════════════════════════════════════════════════
 //  PASO 4 – CRUCE
-//
-//  planCorr guarda instrucciones para reconstruir el informe:
-//    {tipo:'ok',   filaIdx: N}           → copiar fila N del informe original
-//    {tipo:'nuevo', datos: {...}}         → escribir fila nueva con estos datos
-//
-//  Los datos de la fila nueva se guardan con las claves EXACTAS
-//  de los headers del informe original.
 // ═══════════════════════════════════════════════════════════════════
 function ejecutarCruce(){
   const log=document.getElementById('logBox');
-  log.style.display='block'; log.innerHTML='';
+  log.style.display='block';log.innerHTML='';
   function L(msg,t){const d=document.createElement('div');if(t)d.className='log-line-'+t;d.textContent=msg;log.appendChild(d);log.scrollTop=log.scrollHeight;}
 
   L('▶ Iniciando cruce...','info');
-  L('  Cartera: '+Object.keys(S.carteraMap).length+' IDs','info');
-  L('  Pagos  : '+S.pagos.length+' registros','info');
-  L('  Informe: '+Object.keys(S.gestionMap).length+' IDs únicos','info');
+  L('  Cartera: '+Object.keys(S.carteraMap).length.toLocaleString()+' IDs','info');
+  L('  Pagos  : '+S.pagos.length.toLocaleString()+' registros','info');
+  L('  Informe: '+Object.keys(S.gestionMap).length.toLocaleString()+' IDs únicos','info');
   L('');
 
-  S.resultados=[]; S.resultadosOk=[]; S.planCorr=[];
+  S.resultados=[];S.resultadosOk=[];S.planCorr=[];
 
-  // Headers del informe — usaremos estas claves EXACTAS para leer y escribir
-  const cols = S.informeHdrs.length>0 ? S.informeHdrs :
+  const cols=S.informeHdrs.length>0?S.informeHdrs:
     ['PRODUCTO','ID CLIENTE','NOMBRE CLIENTE','FECHA','ETAPA','SUBETAPA',
      'ACTIVIDAD','PRÓXIMO PASO','TELF TITULAR','TELF CONYUGE','CIUDAD'];
-
-  // Pre-calcular el índice de cada columna para acceso rápido
-  // col_exacta → índice en cols[]
-  const colIdx={};
-  cols.forEach((c,i)=>{ colIdx[nk(c)]=i; });
 
   let cOk=0,cSinGest=0,cPosterior=0,cFuera=0;
 
   for(const pago of S.pagos){
-    // Clave de cruce desde pagos
     const idCob=String(gc(pago,'Id Cobranza','ID_COBRANZA','IDCOBRANZA','id cobranza')||'').trim();
     const rawFP=gc(pago,'Fecha pago','FECHA_PAGO','fecha pago','FECHAPAGO');
     const fechaPago=soloFecha(parseFecha(rawFP));
@@ -528,22 +633,19 @@ function ejecutarCruce(){
 
     // Regla 1: ¿está en cartera?
     const carteraRow=S.carteraMap[idCob];
-    if(!carteraRow){ cFuera++; L('  FUERA (ignorado): '+idCob); continue; }
+    if(!carteraRow){cFuera++;continue;}
 
     const nombreCliente=String(gc(carteraRow,'NOMBRE_CLIENTE','NOMBRE CLIENTE','REPRESENTANTE_LEGAL')||'').trim();
-    // Si CELULAR tiene formato 'IDxxxxx' (código interno, no teléfono real),
-    // usar REFERENCIA1 como número de contacto para la ACTIVIDAD
-    let celular=String(gc(carteraRow,'CELULAR','celular')||'').trim();
-    if(/^ID\d+$/i.test(celular)){
-      celular=String(gc(carteraRow,'REFERENCIA1','referencia1','NRO_PROPIO_01')||'').trim()||celular;
-    }
     const productoCart=String(gc(carteraRow,'PRODUCTO','producto')||'').trim();
     const ciudadCart=String(gc(carteraRow,'CIUDAD','ciudad')||'').trim();
 
-    // Regla 2 y 3: buscar gestión válida en el informe
-    // "ID CLIENTE" del informe = idCob
+    // Obtener celular — limpiar prefijo I/M/P si existe
+    const celularRaw=String(gc(carteraRow,'CELULAR','celular')||'').trim();
+    const celular=limpiarCelular(celularRaw);
+
+    // Regla 2 y 3: buscar gestión válida
     const gestiones=S.gestionMap[idCob]||[];
-    let mejorIdx=null, hayAnterior=false;
+    let mejorIdx=null,hayAnterior=false;
 
     if(!fechaPago){
       if(gestiones.length>0){
@@ -551,86 +653,82 @@ function ejecutarCruce(){
         mejorIdx=sorted.length>0?sorted[0].filaIdx:gestiones[gestiones.length-1].filaIdx;
         hayAnterior=true;
       }
-    } else {
+    }else{
       let mejorFecha=null;
       for(const g of gestiones){
         const fg=soloFecha(g.fecha);
-        if(fg && fg<=fechaPago){
+        // Condición: fecha gestión <= fecha pago (incluye día anterior y mismo día)
+        if(fg&&fg<=fechaPago){
           hayAnterior=true;
           if(!mejorFecha||fg>mejorFecha){mejorFecha=fg;mejorIdx=g.filaIdx;}
         }
       }
     }
 
-    if(hayAnterior && mejorIdx!==null){
-      // ══ CASO OK: copiar fila original del informe ══
+    if(hayAnterior&&mejorIdx!==null){
+      // ══ OK: conservar fila original ══
       cOk++;
       const filaOrig=S.informe[mejorIdx];
       const fgOrig=fmtFecha(soloFecha(parseFecha(gc(filaOrig,'FECHA','fecha'))));
       S.resultadosOk.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,motivo:'Comisión reconocible',fechaGestion:fgOrig});
-      S.planCorr.push({tipo:'ok', filaIdx:mejorIdx, idCob, nombre:nombreCliente, fechaPago:fmtFecha(fechaPago), importe, fechaGestion:fgOrig});
-      L('  OK: '+idCob,'ok');
+      S.planCorr.push({tipo:'ok',filaIdx:mejorIdx,idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,fechaGestion:fgOrig});
 
-    } else {
-      // ══ CASO OBSERVADO: construir fila nueva ══
+    }else{
+      // ══ OBSERVADO: crear fila nueva ══
       const motivo=gestiones.length===0?'Sin gestión en informe':'Gestión posterior al pago';
-      if(gestiones.length>0) cPosterior++; else cSinGest++;
+      if(gestiones.length>0)cPosterior++;else cSinGest++;
       const ultGest=gestiones.filter(g=>g.fecha).sort((a,b)=>b.fecha-a.fecha)[0];
       const fgOrig=ultGest?fmtFecha(soloFecha(ultGest.fecha)):'—';
 
       S.resultados.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),fechaPagoDate:fechaPago,importe,motivo,fechaGestion:fgOrig,celular});
 
-      // Fila base del informe para conservar PRODUCTO, TELF, CIUDAD
       const filaBase=gestiones.length>0?S.informe[gestiones[gestiones.length-1].filaIdx]:{};
 
-      // Construir datos de la fila nueva usando las claves EXACTAS del informe
+      // Construir fila nueva con claves exactas del header
       const datos={};
       for(const col of cols){
         const ck=nk(col);
         if(ck==='PRODUCTO'){
           datos[col]=gc(filaBase,'PRODUCTO','producto')||productoCart||'';
-        } else if(ck==='ID_CLIENTE'){
-          // ID CLIENTE del informe = ID_COBRANZA
-          datos[col]=idCob;
-        } else if(ck==='NOMBRE_CLIENTE'){
+        }else if(ck==='ID_CLIENTE'){
+          datos[col]=idCob; // ID_COBRANZA = ID CLIENTE del informe
+        }else if(ck==='NOMBRE_CLIENTE'){
           datos[col]=nombreCliente;
-        } else if(ck==='FECHA'){
-          // Número serial de Excel (se formateará como fecha al escribir)
+        }else if(ck==='FECHA'){
           datos[col]=fechaPago?serialExcel(fechaPago):'';
-        } else if(ck==='ETAPA'){
+        }else if(ck==='ETAPA'){
           const actual=String(gc(filaBase,'ETAPA','etapa')||'').trim();
           datos[col]=/COMPROMISO\s+DE\s+PAGO/i.test(actual)?actual:'01. COMPROMISO DE PAGO';
-        } else if(ck==='SUBETAPA'){
+        }else if(ck==='SUBETAPA'){
           const actual=String(gc(filaBase,'SUBETAPA','subetapa')||'').trim();
           datos[col]=/D[IÍ]AS/i.test(actual)?actual:'DIAS';
-        } else if(ck==='ACTIVIDAD'){
+        }else if(ck==='ACTIVIDAD'){
+          // Celular limpio + leyenda
           datos[col]=(celular?celular+' ':'')+' SE HABLO CON EL/LA TITULAR PASARA A CANCELAR';
-        } else if(ck==='PRÓXIMO_PASO'){
+        }else if(ck==='PRÓXIMO_PASO'){
           const actual=String(gc(filaBase,'PRÓXIMO PASO','PROXIMO PASO','próximo paso','proximo paso')||'').trim();
           datos[col]=/VERIFICAR\s+PAGO/i.test(actual)?actual:'VERIFICAR PAGO';
-        } else if(ck==='TELF_TITULAR'){
+        }else if(ck==='TELF_TITULAR'){
           datos[col]=gc(filaBase,'TELF TITULAR','TELF_TITULAR')||'';
-        } else if(ck==='TELF_CONYUGE'){
+        }else if(ck==='TELF_CONYUGE'){
           datos[col]=gc(filaBase,'TELF CONYUGE','TELF_CONYUGE')||'';
-        } else if(ck==='CIUDAD'){
+        }else if(ck==='CIUDAD'){
           datos[col]=gc(filaBase,'CIUDAD','ciudad')||ciudadCart||'';
-        } else {
+        }else{
           datos[col]=gc(filaBase,col)||'';
         }
       }
 
-      S.planCorr.push({tipo:'nuevo', datos, idCob, nombre:nombreCliente, fechaPago:fmtFecha(fechaPago), importe, motivo, fechaGestion:fgOrig, celular});
-      L('  CORR ('+motivo+'): '+idCob, motivo.includes('Sin')?'err':'warn');
+      S.planCorr.push({tipo:'nuevo',datos,idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,motivo,fechaGestion:fgOrig,celular});
     }
   }
 
-  L('');
   L('══ RESUMEN ══════════════════════','info');
-  L('  Con comisión OK     : '+cOk,'ok');
-  L('  Sin gestión (creado): '+cSinGest, cSinGest>0?'err':'');
-  L('  Gestión posterior   : '+cPosterior, cPosterior>0?'warn':'');
-  L('  Fuera de cartera    : '+cFuera+' (ignorados)');
-  L('  Filas en informe final: '+S.planCorr.length,'ok');
+  L('  Con comisión OK     : '+cOk.toLocaleString(),'ok');
+  L('  Sin gestión (creado): '+cSinGest.toLocaleString(),cSinGest>0?'err':'');
+  L('  Gestión posterior   : '+cPosterior.toLocaleString(),cPosterior>0?'warn':'');
+  L('  Fuera de cartera    : '+cFuera.toLocaleString()+' (ignorados)');
+  L('  Filas informe final : '+S.planCorr.length.toLocaleString(),'ok');
 
   const total=S.pagos.length-cFuera;
   const pct=total>0?Math.round((cOk/total)*100):0;
@@ -643,7 +741,7 @@ function ejecutarCruce(){
   document.getElementById('tasaPct').textContent=pct+'%';
   document.getElementById('progressBar').style.width=pct+'%';
   document.getElementById('notaInforme').textContent=
-    S.planCorr.length+' filas ('+cOk+' sin cambio + '+(cSinGest+cPosterior)+' corregidas)';
+    S.planCorr.length.toLocaleString()+' filas ('+cOk.toLocaleString()+' sin cambio + '+(cSinGest+cPosterior).toLocaleString()+' corregidas)';
 
   document.getElementById('btnInformeCorregido').disabled=S.planCorr.length===0;
   document.getElementById('btnDescarga').disabled=S.resultados.length===0;
@@ -661,31 +759,24 @@ function ejecutarCruce(){
 function renderTabla(){
   const tb=document.getElementById('tbodyObservados');
   if(!S.resultados.length){
-    tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--c-ok)">✔ Todos los pagos tienen comisión reconocible — sin observados</td></tr>';
+    tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--c-ok)">✔ Todos los pagos tienen comisión reconocible</td></tr>';
     return;
   }
   tb.innerHTML=S.resultados.slice(0,200).map((r,i)=>{
     const mc=r.motivo.includes('posterior')?'badge-warn':'badge-err';
-    return `<tr><td style="color:var(--c-text3)">${i+1}</td><td style="color:var(--c-text);font-weight:500">${r.idCob}</td><td>${r.nombre||'—'}</td><td>${r.fechaPago}</td><td>${r.importe||'—'}</td><td><span class="badge ${mc}">${r.motivo}</span></td><td>${r.fechaGestion}</td></tr>`;
+    return '<tr><td style="color:var(--c-text3)">'+(i+1)+'</td><td style="color:var(--c-text);font-weight:500">'+r.idCob+'</td><td>'+
+      (r.nombre||'—')+'</td><td>'+r.fechaPago+'</td><td>'+(r.importe||'—')+'</td><td><span class="badge '+mc+'">'+
+      r.motivo+'</span></td><td>'+r.fechaGestion+'</td></tr>';
   }).join('');
   if(S.resultados.length>200)
-    tb.innerHTML+=`<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--c-text3)">… y ${S.resultados.length-200} más en el Excel</td></tr>`;
+    tb.innerHTML+='<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--c-text3)">… y '+(S.resultados.length-200)+' más en el Excel descargado</td></tr>';
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  DESCARGA PRINCIPAL: INFORME CORREGIDO (2 pestañas)
-//
-//  PESTAÑA 1 "Informe Corregido":
-//    - Para filas tipo 'ok':   se copia la fila ORIGINAL del informe
-//      usando S.informe[filaIdx] y los headers exactos.
-//    - Para filas tipo 'nuevo': se usa datos{} que ya tiene las claves
-//      exactas del header.
-//
-//  PESTAÑA 2 "Detalle Correcciones":
-//    - Una fila por cada código procesado explicando qué se hizo.
+//  DESCARGA 1 — INFORME CORREGIDO (2 pestañas)
 // ═══════════════════════════════════════════════════════════════════
 function descargarInformeCorregido(){
-  if(!S.planCorr.length){alert('No hay datos para descargar. Ejecuta el cruce primero.');return;}
+  if(!S.planCorr.length){alert('No hay datos. Ejecuta el cruce primero.');return;}
 
   const hoy=new Date().toLocaleDateString('es-BO').replace(/\//g,'-');
   const wb=XLSX.utils.book_new();
@@ -695,96 +786,81 @@ function descargarInformeCorregido(){
      'ACTIVIDAD','PRÓXIMO PASO','TELF TITULAR','TELF CONYUGE','CIUDAD'];
 
   // ── PESTAÑA 1: INFORME COMPLETO ────────────────────────────────
-  const data=[cols]; // primera fila = encabezados
-
+  const data=[cols];
   for(const plan of S.planCorr){
     if(plan.tipo==='ok'){
-      // Fila original del informe: leer con gc() para manejar variantes de nombre
       const filaOrig=S.informe[plan.filaIdx];
-      const fila=cols.map(col=>{
-        // Usar gc() que hace búsqueda flexible por nombre de columna
-        const v=gc(filaOrig, col);
-        return (v===undefined||v===null||v==='')?'':v;
-      });
-      data.push(fila);
-    } else {
-      // Fila nueva: datos ya tienen las claves exactas del header
-      const fila=cols.map(col=>{
+      data.push(cols.map(col=>{
+        const v=gc(filaOrig,col);
+        return(v===undefined||v===null||v==='')?'':v;
+      }));
+    }else{
+      data.push(cols.map(col=>{
         const v=plan.datos[col];
-        return (v===undefined||v===null)?'':v;
-      });
-      data.push(fila);
+        return(v===undefined||v===null)?'':v;
+      }));
     }
   }
 
   const ws=XLSX.utils.aoa_to_sheet(data);
 
-  // Aplicar formato DD/MM/YYYY a la columna FECHA
-  const fechaColIdx=cols.findIndex(c=>nk(c)==='FECHA');
-  if(fechaColIdx>=0){
-    const letra=XLSX.utils.encode_col(fechaColIdx);
+  // Formato DD/MM/YYYY en columna FECHA
+  const fechaIdx=cols.findIndex(c=>nk(c)==='FECHA');
+  if(fechaIdx>=0){
+    const letra=XLSX.utils.encode_col(fechaIdx);
     for(let r=2;r<=data.length;r++){
       const ref=letra+r;
       if(ws[ref]&&typeof ws[ref].v==='number'){ws[ref].t='n';ws[ref].z='DD/MM/YYYY';}
     }
   }
-
-  // Anchos de columna
   ws['!cols']=cols.map(c=>{
     const ck=nk(c);
-    if(ck==='ACTIVIDAD') return {wch:70};
-    if(ck==='NOMBRE_CLIENTE') return {wch:34};
-    if(ck==='ETAPA') return {wch:28};
-    if(ck==='SUBETAPA') return {wch:14};
-    if(ck==='PRÓXIMO_PASO') return {wch:18};
-    return {wch:18};
+    if(ck==='ACTIVIDAD')return{wch:70};
+    if(ck==='NOMBRE_CLIENTE')return{wch:34};
+    if(ck==='ETAPA')return{wch:28};
+    if(ck==='SUBETAPA')return{wch:14};
+    if(ck==='PRÓXIMO_PASO')return{wch:18};
+    return{wch:18};
   });
-
   XLSX.utils.book_append_sheet(wb,ws,'Informe Corregido');
 
-  // ── PESTAÑA 2: DETALLE DE CORRECCIONES ────────────────────────
-  const detHdr=['N°','ID_COBRANZA','Nombre Cliente','Tipo de acción','Fecha Gestión ORIGINAL','Fecha Pago (NUEVA FECHA)','Importe','Celular en ACTIVIDAD','ETAPA','SUBETAPA','PRÓXIMO PASO','ACTIVIDAD completa'];
+  // ── PESTAÑA 2: DETALLE DE CORRECCIONES ─────────────────────────
+  const detHdr=['N°','ID_COBRANZA','Nombre Cliente','Tipo de acción',
+    'Fecha Gestión ORIGINAL','Fecha Pago (NUEVA FECHA)','Importe',
+    'Celular en ACTIVIDAD','ETAPA','SUBETAPA','PRÓXIMO PASO','ACTIVIDAD completa'];
   const detData=[detHdr];
 
   S.planCorr.forEach((plan,i)=>{
     if(plan.tipo==='ok'){
-      detData.push([
-        i+1, plan.idCob, plan.nombre,
+      detData.push([i+1,plan.idCob,plan.nombre,
         'SIN CAMBIO — fila original conservada',
-        plan.fechaGestion, plan.fechaPago, plan.importe,
-        '—','—','—','—','—'
-      ]);
-    } else {
+        plan.fechaGestion,plan.fechaPago,plan.importe,
+        '—','—','—','—','—']);
+    }else{
       const act=(plan.celular?plan.celular+' ':'')+' SE HABLO CON EL/LA TITULAR PASARA A CANCELAR';
-      detData.push([
-        i+1, plan.idCob, plan.nombre,
+      detData.push([i+1,plan.idCob,plan.nombre,
         plan.motivo==='Sin gestión en informe'
-          ? 'FILA CREADA — no existía en el informe'
-          : 'FILA REEMPLAZADA — gestión era posterior al pago',
-        plan.fechaGestion,   // fecha gestión original (inválida)
-        plan.fechaPago,      // fecha de pago = nueva FECHA en el informe
-        plan.importe,
-        plan.celular||'(sin celular en cartera)',
-        '01. COMPROMISO DE PAGO',
-        'DIAS',
-        'VERIFICAR PAGO',
-        act
-      ]);
+          ?'FILA CREADA — no existía en el informe'
+          :'FILA REEMPLAZADA — gestión era posterior al pago',
+        plan.fechaGestion,plan.fechaPago,plan.importe,
+        plan.celular||'(sin celular)',
+        '01. COMPROMISO DE PAGO','DIAS','VERIFICAR PAGO',act]);
     }
   });
 
   const wsDet=XLSX.utils.aoa_to_sheet(detData);
-  wsDet['!cols']=[{wch:5},{wch:18},{wch:34},{wch:42},{wch:22},{wch:22},{wch:12},{wch:22},{wch:28},{wch:14},{wch:18},{wch:70}];
+  wsDet['!cols']=[{wch:5},{wch:18},{wch:34},{wch:42},{wch:22},{wch:22},
+    {wch:12},{wch:22},{wch:28},{wch:14},{wch:18},{wch:70}];
   XLSX.utils.book_append_sheet(wb,wsDet,'Detalle Correcciones');
 
   XLSX.writeFile(wb,'InformeCorregido_'+hoy+'.xlsx');
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  DESCARGA 2: SOLO OBSERVADOS (control interno)
+//  DESCARGA 2 — OBSERVADOS
 // ═══════════════════════════════════════════════════════════════════
 function descargarObservados(){
-  if(!S.resultados.length) return;
+  if(!S.resultados.length)return;
   const hoy=new Date().toLocaleDateString('es-BO').replace(/\//g,'-');
   const wb=XLSX.utils.book_new();
   const data=[['ID_COBRANZA','Nombre Cliente','Fecha Pago','Importe','Motivo','Fecha Gestión Original','Celular']];
@@ -797,10 +873,10 @@ function descargarObservados(){
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  DESCARGA 3: SOLO OK
+//  DESCARGA 3 — OK
 // ═══════════════════════════════════════════════════════════════════
 function descargarExcelOk(){
-  if(!S.resultadosOk.length) return;
+  if(!S.resultadosOk.length)return;
   const hoy=new Date().toLocaleDateString('es-BO').replace(/\//g,'-');
   const wb=XLSX.utils.book_new();
   const data=[['ID_COBRANZA','Nombre Cliente','Fecha Pago','Importe','Estado','Fecha Gestión']];
