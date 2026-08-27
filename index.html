@@ -244,6 +244,7 @@
       <div class="check-item"><span class="ci-icon">①</span><span class="ci-label"><strong>Id Cobranza</strong> del pago debe existir como <strong>ID_COBRANZA</strong> en la cartera asignada</span></div>
       <div class="check-item"><span class="ci-icon">②</span><span class="ci-label">Ese mismo código debe aparecer como <strong>ID CLIENTE</strong> en el informe de gestión</span></div>
       <div class="check-item"><span class="ci-icon">③</span><span class="ci-label">La <strong>FECHA</strong> de gestión debe ser igual o <strong>anterior</strong> a la Fecha de pago (incluyendo el día anterior)</span></div>
+      <div class="check-item"><span class="ci-icon">④</span><span class="ci-label"><strong>Vigencia:</strong> la gestión no puede ser más antigua que el <strong>1° día del mes anterior</strong> al pago. Ej: pago 20/08 → válida desde el 01/07 en adelante, no antes</span></div>
     </div>
   </div>
   <div style="display:flex;gap:10px;margin-top:1.5rem;align-items:center;">
@@ -262,6 +263,7 @@
     <div class="stat-card"><div class="stat-label">Con comisión OK</div><div class="stat-value ok" id="rOk">—</div></div>
     <div class="stat-card"><div class="stat-label">Sin gestión</div><div class="stat-value err" id="rSinGestion">—</div></div>
     <div class="stat-card"><div class="stat-label">Gestión posterior</div><div class="stat-value warn" id="rPosterior">—</div></div>
+    <div class="stat-card"><div class="stat-label">Gestión antigua (&gt;1 mes)</div><div class="stat-value err" id="rAntigua">—</div></div>
     <div class="stat-card"><div class="stat-label">Fuera de cartera</div><div class="stat-value" id="rFueraCartera">—</div></div>
   </div>
   <div style="margin:.5rem 0 1.5rem;">
@@ -278,6 +280,7 @@
         <span class="tag tag-ok">✔ Ya cumplía → conservado sin cambio</span>
         <span class="tag tag-warn">⚡ Gestión posterior → reemplazado con fecha de pago</span>
         <span class="tag tag-err">✚ Sin gestión → fila nueva creada</span>
+        <span class="tag tag-err">⏳ Gestión antigua (&gt;1 mes) → reemplazado con fecha de pago</span>
       </div>
       <button class="btn btn-ok" onclick="descargarInformeCorregido()" id="btnInformeCorregido" disabled>⬇ Descargar INFORME CORREGIDO (.xlsx)</button>
       <span style="font-size:11px;color:var(--c-text3);margin-left:10px" id="notaInforme"></span>
@@ -603,6 +606,13 @@ function soloFecha(d){if(!d)return null;return new Date(d.getFullYear(),d.getMon
 function fmtFecha(d){if(!d)return '—';return d.toLocaleDateString('es-BO');}
 function serialExcel(d){if(!d)return '';return Math.floor((d-new Date(Date.UTC(1899,11,30)))/86400000);}
 
+// Primer día del mes anterior al pago — límite inferior de vigencia de la gestión.
+// Ej: pago 20-08-2026 → válido desde 01-07-2026 (no admite junio ni antes).
+function primerDiaMesAnterior(fechaPago){
+  if(!fechaPago)return null;
+  return new Date(fechaPago.getFullYear(),fechaPago.getMonth()-1,1);
+}
+
 // ═══════════════════════════════════════════════════════════════════
 //  PASO 4 – CRUCE
 // ═══════════════════════════════════════════════════════════════════
@@ -651,7 +661,7 @@ function ejecutarCruce(){
 
   L('  Pagos únicos (deduplicados): '+Object.keys(pagosPorCodigo).length.toLocaleString(),'info');
 
-  let cOk=0,cSolo2=0,cEtapaInv=0,cPosterior=0,cSinGest=0,cFuera=0;
+  let cOk=0,cSolo2=0,cEtapaInv=0,cPosterior=0,cSinGest=0,cFuera=0,cAntigua=0;
 
   for(const idCob of Object.keys(pagosPorCodigo)){
     const {pago, fechaPago}=pagosPorCodigo[idCob];
@@ -671,11 +681,16 @@ function ejecutarCruce(){
     // ID CLIENTE del informe = ID_COBRANZA de la cartera
     const gestiones=S.gestionMap[idCob]||[];
 
-    // Encontrar la gestión más reciente con fecha <= fechaPago
+    // Ventana de vigencia: la gestión debe estar entre el 1° del mes anterior
+    // al pago y la fecha de pago. Una gestión más antigua (ej. de 2+ meses
+    // atrás) NO cuenta como válida aunque sea cronológicamente anterior al pago.
+    const fechaMinima=primerDiaMesAnterior(fechaPago);
+
+    // Encontrar la gestión más reciente con fechaMinima <= fecha <= fechaPago
     let mejorIdx=null, mejorFecha=null;
     for(const g of gestiones){
       const fg=soloFecha(g.fecha);
-      if(fg && (!fechaPago || fg<=fechaPago)){
+      if(fg && (!fechaPago || fg<=fechaPago) && (!fechaMinima || fg>=fechaMinima)){
         if(!mejorFecha||fg>mejorFecha){mejorFecha=fg;mejorIdx=g.filaIdx;}
       }
     }
@@ -774,15 +789,35 @@ function ejecutarCruce(){
           fechaGestion:'—',celular,caso:5,
           casoDesc:'FILA CREADA — no existía en el informe'});
       } else {
-        // ══ CASO 4: Gestión existe pero es posterior al pago ══
-        cPosterior++;
-        const datos=construirFilaNueva(filaBase);
-        S.resultados.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,
-          motivo:'CASO 4 — Gestión posterior al pago ('+fgOrig+')',fechaGestion:fgOrig,celular,caso:4});
-        S.planCorr.push({tipo:'nuevo',datos,idCob,nombre:nombreCliente,
-          fechaPago:fmtFecha(fechaPago),importe,motivo:'CASO 4 — Gestión posterior al pago',
-          fechaGestion:fgOrig,celular,caso:4,
-          casoDesc:'FILA REEMPLAZADA — gestión posterior al pago ('+fgOrig+')'});
+        // La gestión más reciente que existe (ultGest) quedó fuera de la
+        // ventana válida. Puede ser porque es POSTERIOR al pago (aún no
+        // gestionada al momento de pagar) o porque es DEMASIADO ANTIGUA
+        // (anterior al 1° del mes previo — ya no cuenta como vigente).
+        const fechaUlt=ultGest?soloFecha(ultGest.fecha):null;
+        const esPosterior=fechaUlt && fechaPago && fechaUlt>fechaPago;
+
+        if(esPosterior){
+          // ══ CASO 4: Gestión existe pero es posterior al pago ══
+          cPosterior++;
+          const datos=construirFilaNueva(filaBase);
+          S.resultados.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,
+            motivo:'CASO 4 — Gestión posterior al pago ('+fgOrig+')',fechaGestion:fgOrig,celular,caso:4});
+          S.planCorr.push({tipo:'nuevo',datos,idCob,nombre:nombreCliente,
+            fechaPago:fmtFecha(fechaPago),importe,motivo:'CASO 4 — Gestión posterior al pago',
+            fechaGestion:fgOrig,celular,caso:4,
+            casoDesc:'FILA REEMPLAZADA — gestión posterior al pago ('+fgOrig+')'});
+        } else {
+          // ══ CASO 6: Gestión demasiado antigua (fuera de la ventana de 1 mes) ══
+          cAntigua++;
+          const datos=construirFilaNueva(filaBase);
+          const limite=fmtFecha(fechaMinima);
+          S.resultados.push({idCob,nombre:nombreCliente,fechaPago:fmtFecha(fechaPago),importe,
+            motivo:'CASO 6 — Gestión demasiado antigua ('+fgOrig+', antes del '+limite+')',fechaGestion:fgOrig,celular,caso:6});
+          S.planCorr.push({tipo:'nuevo',datos,idCob,nombre:nombreCliente,
+            fechaPago:fmtFecha(fechaPago),importe,motivo:'CASO 6 — Gestión demasiado antigua',
+            fechaGestion:fgOrig,celular,caso:6,
+            casoDesc:'FILA REEMPLAZADA — última gestión ('+fgOrig+') es anterior al '+limite+' (más de 1 mes antes del pago)'});
+        }
       }
     }
   }
@@ -823,6 +858,7 @@ function ejecutarCruce(){
   L('  CASO 3 — Etapa inválida (03/04)     : '+cEtapaInv.toLocaleString(),cEtapaInv>0?'warn':'ok');
   L('  CASO 4 — Gestión posterior al pago  : '+cPosterior.toLocaleString(),cPosterior>0?'warn':'ok');
   L('  CASO 5 — Sin gestión (fila nueva)   : '+cSinGest.toLocaleString(),cSinGest>0?'err':'ok');
+  L('  CASO 6 — Gestión demasiado antigua  : '+cAntigua.toLocaleString(),cAntigua>0?'err':'ok');
   L('  Fuera de cartera (ignorados)         : '+cFuera.toLocaleString());
   L('  Pagos duplicados ignorados           : '+(S.pagos.length-Object.keys(pagosPorCodigo).length).toLocaleString());
   L('  Filas en informe corregido           : '+S.planCorr.length.toLocaleString(),'ok');
@@ -836,13 +872,14 @@ function ejecutarCruce(){
   document.getElementById('rOk').textContent=cOk.toLocaleString();
   document.getElementById('rSinGestion').textContent=cSinGest.toLocaleString();
   document.getElementById('rPosterior').textContent=(cPosterior+cEtapaInv+cSolo2).toLocaleString();
+  document.getElementById('rAntigua').textContent=cAntigua.toLocaleString();
   document.getElementById('rFueraCartera').textContent=cFuera.toLocaleString();
   document.getElementById('tasaPct').textContent=pct+'%';
   document.getElementById('progressBar').style.width=pct+'%';
   document.getElementById('notaInforme').textContent=
     S.planCorr.length.toLocaleString()+' filas — '+
     cOk+' sin cambio · '+cSolo2+' solo próx.paso · '+
-    cEtapaInv+' etapa inválida · '+cPosterior+' posterior · '+cSinGest+' sin gestión';
+    cEtapaInv+' etapa inválida · '+cPosterior+' posterior · '+cSinGest+' sin gestión · '+cAntigua+' gestión antigua';
 
   document.getElementById('btnInformeCorregido').disabled=S.planCorr.length===0;
   document.getElementById('btnDescarga').disabled=S.resultados.length===0;

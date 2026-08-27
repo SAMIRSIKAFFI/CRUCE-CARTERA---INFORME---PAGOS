@@ -9,10 +9,11 @@ Herramienta web para verificar qué pagos de la cartera de cobranzas tienen la g
 1. **Carga las carteras asignadas** (uno o varios archivos Excel del 1° de mes).
 2. **Carga la base de pagos** subida al sistema de cobranza.
 3. **Carga el informe de gestiones** generado por el sistema de cobranza.
-4. **Cruza los tres archivos** aplicando las tres reglas de validación:
+4. **Cruza los tres archivos** aplicando las reglas de validación:
    - ✅ El código de cobranza del pago debe existir en la cartera asignada.
    - ✅ El código debe aparecer en el informe de gestión.
    - ✅ La fecha de gestión debe ser **igual o anterior** a la fecha de pago (nunca posterior).
+   - ✅ **Vigencia:** la gestión no puede ser más antigua que el **1° día del mes anterior** al pago (ej. pago el 20/08 → gestión válida desde el 01/07 en adelante; una gestión de junio o antes no cuenta, aunque sea anterior al pago).
 5. **Genera un Excel de observados** con todos los códigos que no cumplen las condiciones, listo para presentar a VIVA.
 
 ---
